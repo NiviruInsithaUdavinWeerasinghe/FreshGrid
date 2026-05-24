@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 
-const API = 'http://localhost:5000/api/chat';
+const API = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/chat';
 
 export const useAiAssistant = () => {
   const [messages, setMessages] = useState([]);
@@ -110,7 +110,7 @@ export const useAiAssistant = () => {
                 paymentStatus: 'Pending'
               };
 
-              const res = await axios.post('http://localhost:5000/api/orders', orderPayload, {
+              const res = await axios.post((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/orders', orderPayload, {
                 headers: { Authorization: `Bearer ${token}` }
               });
 
@@ -133,7 +133,7 @@ export const useAiAssistant = () => {
             smoothNavigate('/login');
           } else {
             try {
-              await axios.post('http://localhost:5000/api/auth/subscribe', {}, {
+              await axios.post((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/auth/subscribe', {}, {
                 headers: { Authorization: `Bearer ${token}` }
               });
             } catch(e) {

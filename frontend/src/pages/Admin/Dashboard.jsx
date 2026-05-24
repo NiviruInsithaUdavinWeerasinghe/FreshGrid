@@ -326,9 +326,9 @@ const Dashboard = () => {
       try {
         const token = localStorage.getItem('token');
         const [resProducts, resOrders, resOffers] = await Promise.all([
-          axios.get('http://localhost:5000/api/products'),
-          axios.get('http://localhost:5000/api/orders/all', { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get('http://localhost:5000/api/offers', { headers: { Authorization: `Bearer ${token}` } })
+          axios.get((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/products'),
+          axios.get((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/orders/all', { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/offers', { headers: { Authorization: `Bearer ${token}` } })
         ]);
         
         setDashboardData({

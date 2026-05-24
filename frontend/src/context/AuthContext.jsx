@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
   const fetchMe = async (authToken) => {
     try {
       axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
-      const res = await axios.get('http://localhost:5000/api/auth/me');
+      const res = await axios.get((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/auth/me');
       if (res.data.success) {
         setUser(res.data.user);
       } else {
@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+    const res = await axios.post((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/auth/login', { email, password });
     if (res.data.success) {
       const newToken = res.data.token;
       localStorage.setItem('userToken', newToken);
@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (name, email, password) => {
-    const res = await axios.post('http://localhost:5000/api/auth/register', { name, email, password });
+    const res = await axios.post((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/auth/register', { name, email, password });
     return res.data;
   };
 
@@ -67,11 +67,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const loginWithGoogle = () => {
-    window.location.href = 'http://localhost:5000/api/auth/google';
+    window.location.href = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/auth/google';
   };
 
   const loginWithFacebook = () => {
-    window.location.href = 'http://localhost:5000/api/auth/facebook';
+    window.location.href = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/auth/facebook';
   };
 
   const handleOAuthLogin = (newToken) => {
@@ -86,7 +86,7 @@ export const AuthProvider = ({ children }) => {
     const isFormData = payload instanceof FormData;
     const headers = isFormData ? { 'Content-Type': 'multipart/form-data' } : {};
 
-    const res = await axios.put('http://localhost:5000/api/auth/profile', payload, { headers });
+    const res = await axios.put((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/auth/profile', payload, { headers });
     if (res.data.success) {
       setUser(res.data.user);
       return res.data;
@@ -94,7 +94,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const changeUserPassword = async (currentPassword, newPassword) => {
-    const res = await axios.put('http://localhost:5000/api/auth/profile/password', {
+    const res = await axios.put((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/auth/profile/password', {
       currentPassword,
       newPassword,
     });
@@ -105,7 +105,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const verifyCurrentPassword = async (currentPassword) => {
-    const res = await axios.post('http://localhost:5000/api/auth/profile/verify-password', {
+    const res = await axios.post((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/auth/profile/verify-password', {
       currentPassword,
     });
     return res.data;
@@ -116,7 +116,7 @@ export const AuthProvider = ({ children }) => {
   const registerPasskey = async () => {
     try {
       // 1. Fetch options from backend
-      const optionsRes = await axios.post('http://localhost:5000/api/auth/passkey/register/begin');
+      const optionsRes = await axios.post((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/auth/passkey/register/begin');
       const options = optionsRes.data;
 
       // 2. Open browser passkey popup
@@ -124,7 +124,7 @@ export const AuthProvider = ({ children }) => {
 
       // 3. Post verification payload back to backend
       const verifyRes = await axios.post(
-        'http://localhost:5000/api/auth/passkey/register/finish',
+        (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/auth/passkey/register/finish',
         registrationResponse
       );
 
@@ -142,7 +142,7 @@ export const AuthProvider = ({ children }) => {
 
   const unlinkPasskey = async () => {
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/passkey/unlink');
+      const res = await axios.post((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/auth/passkey/unlink');
       if (res.data.success) {
         await fetchMe(token);
         return res.data;
@@ -162,7 +162,7 @@ export const AuthProvider = ({ children }) => {
         userId = prefetchedData.userId;
       } else {
         // 1. Fetch authentication options
-        const beginRes = await axios.post('http://localhost:5000/api/auth/passkey/login/begin', { email });
+        const beginRes = await axios.post((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/auth/passkey/login/begin', { email });
         options = beginRes.data.options;
         userId = beginRes.data.userId;
       }
@@ -171,7 +171,7 @@ export const AuthProvider = ({ children }) => {
       const assertionResponse = await startAuthentication({ optionsJSON: options });
 
       // 3. Verify assertion payload
-      const finishRes = await axios.post('http://localhost:5000/api/auth/passkey/login/finish', {
+      const finishRes = await axios.post((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/auth/passkey/login/finish', {
         response: assertionResponse,
         userId,
       });

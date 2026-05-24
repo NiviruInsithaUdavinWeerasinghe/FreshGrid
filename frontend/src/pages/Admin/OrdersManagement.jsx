@@ -125,7 +125,7 @@ const OrdersManagement = () => {
   const fetchOrders = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/orders/all', {
+      const res = await axios.get((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/orders/all', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data.success) {
@@ -149,7 +149,7 @@ const OrdersManagement = () => {
   const handleStatusChange = async (orderId, newStatus) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.put(`http://localhost:5000/api/orders/${orderId}/status`, 
+      const res = await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/orders/${orderId}/status`, 
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -165,7 +165,7 @@ const OrdersManagement = () => {
   const handlePaymentStatusChange = async (orderId, newStatus) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.put(`http://localhost:5000/api/orders/${orderId}/payment`, 
+      const res = await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/orders/${orderId}/payment`, 
         { paymentStatus: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );

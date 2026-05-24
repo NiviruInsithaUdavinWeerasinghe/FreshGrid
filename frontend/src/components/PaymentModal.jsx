@@ -77,7 +77,7 @@ export default function PaymentModal({ isOpen, onClose, amount, deliveryFee = 0,
         paymentStatus: isCashCheckout ? 'Pending' : 'Paid'
       };
 
-      const res = await axios.post('http://localhost:5000/api/orders', payload, {
+      const res = await axios.post((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/orders', payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

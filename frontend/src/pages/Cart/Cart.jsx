@@ -87,7 +87,7 @@ const Cart = () => {
           quantity: item.quantity
         }));
         
-        const res = await axios.post('http://localhost:5000/api/delivery/calculate', 
+        const res = await axios.post((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/delivery/calculate', 
           { destLat: lat, destLng: lng, cartItems: items, cartSubtotal: subtotal },
           { headers: { Authorization: `Bearer ${token}` } }
         );

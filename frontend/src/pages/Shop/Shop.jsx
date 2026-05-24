@@ -121,7 +121,7 @@ const Shop = () => {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/subscribe',
+        (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/auth/subscribe',
         {},
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
@@ -140,8 +140,8 @@ const Shop = () => {
     const fetchProducts = async () => {
       try {
         const [resProducts, resOffers] = await Promise.all([
-          axios.get('http://localhost:5000/api/products'),
-          axios.get('http://localhost:5000/api/offers/active')
+          axios.get((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/products'),
+          axios.get((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/offers/active')
         ]);
         
         let allItems = [];

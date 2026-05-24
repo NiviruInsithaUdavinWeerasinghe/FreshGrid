@@ -466,8 +466,8 @@ const SpecialOffers = () => {
     try {
       const token = localStorage.getItem('token');
       const [resOffers, resProducts] = await Promise.all([
-        axios.get('http://localhost:5000/api/offers', { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get('http://localhost:5000/api/products')
+        axios.get((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/offers', { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/products')
       ]);
       setOffers(resOffers.data.data);
       setProducts(resProducts.data.data);
@@ -485,9 +485,9 @@ const SpecialOffers = () => {
   const handleSave = async (formData, id) => {
     const token = localStorage.getItem('token');
     if (id) {
-      await axios.put(`http://localhost:5000/api/offers/${id}`, formData, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/offers/${id}`, formData, { headers: { Authorization: `Bearer ${token}` } });
     } else {
-      await axios.post('http://localhost:5000/api/offers', formData, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/offers', formData, { headers: { Authorization: `Bearer ${token}` } });
     }
     await fetchData();
     setModal(null);
@@ -495,14 +495,14 @@ const SpecialOffers = () => {
 
   const handleToggleActive = async (offer) => {
     const token = localStorage.getItem('token');
-    await axios.put(`http://localhost:5000/api/offers/${offer._id}`, { isActive: !offer.isActive }, { headers: { Authorization: `Bearer ${token}` } });
+    await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/offers/${offer._id}`, { isActive: !offer.isActive }, { headers: { Authorization: `Bearer ${token}` } });
     fetchData();
   };
 
   const handleDelete = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/offers/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/offers/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       setConfirmDelete(null);
       fetchData();
     } catch (error) {

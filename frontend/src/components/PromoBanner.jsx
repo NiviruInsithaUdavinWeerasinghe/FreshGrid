@@ -15,7 +15,7 @@ const PromoBanner = () => {
   useEffect(() => {
     const fetchOffers = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/offers/active');
+        const res = await axios.get((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/offers/active');
         if (res.data.success) {
           // Filter to only those where showBanner is true
           const bannerOffers = res.data.data.filter(offer => offer.showBanner);

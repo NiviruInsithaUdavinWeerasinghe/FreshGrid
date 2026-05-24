@@ -196,7 +196,7 @@ const ProductModal = ({ product, onSave, onClose }) => {
     setMetricsError(null);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post('http://localhost:5000/api/products/estimate-metrics', {
+      const res = await axios.post((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/products/estimate-metrics', {
         name: form.name,
         category: form.category,
         description: form.description
@@ -527,7 +527,7 @@ const ProductsManagement = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/products");
+      const res = await axios.get((import.meta.env.VITE_API_URL || 'http://localhost:5000') + "/api/products");
       setProducts(res.data.data);
     } catch (error) {
       showToast("Error fetching products", "error");
@@ -561,12 +561,12 @@ const ProductsManagement = () => {
     try {
       if (product._id) {
         await axios.put(
-          `http://localhost:5000/api/products/${product._id}`,
+          `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/products/${product._id}`,
           formData,
         );
         showToast("Product updated successfully!");
       } else {
-        await axios.post("http://localhost:5000/api/products", formData);
+        await axios.post((import.meta.env.VITE_API_URL || 'http://localhost:5000') + "/api/products", formData);
         showToast("Product added successfully!");
       }
       await fetchProducts(); // wait for list to refresh before closing
@@ -580,7 +580,7 @@ const ProductsManagement = () => {
   const handleDelete = async () => {
     try {
       await axios.delete(
-        `http://localhost:5000/api/products/${modal.product._id}`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/products/${modal.product._id}`,
       );
       showToast("Product deleted.", "error");
       fetchProducts();
