@@ -1,12 +1,21 @@
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
 
 dotenv.config();
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-// Sender address: use your verified domain address, or 'onboarding@resend.dev' for testing
-const FROM_ADDRESS = process.env.RESEND_FROM || 'FreshGrid <onboarding@resend.dev>';
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',   // Explicit host — avoids service preset resolving to IPv6
+  port: 587,
+  secure: false,            // STARTTLS on port 587
+  family: 4,                // CRITICAL: force IPv4 — Render free plan blocks IPv6 outbound
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+  tls: {
+    rejectUnauthorized: false,
+  },
+});
 
 const sendWelcomeEmail = async (email, name) => {
   const htmlContent = `
@@ -62,14 +71,13 @@ const sendWelcomeEmail = async (email, name) => {
   `;
 
   try {
-    const { data, error } = await resend.emails.send({
-      from: FROM_ADDRESS,
+    const info = await transporter.sendMail({
+      from: '"FreshGrid" <' + process.env.GMAIL_USER + '>',
       to: email,
       subject: 'Welcome to Fresh Club VIP! 🎁',
       html: htmlContent,
     });
-    if (error) throw error;
-    console.log('Welcome email sent:', data?.id);
+    console.log('Welcome email sent: %s', info.messageId);
     return true;
   } catch (error) {
     console.error('Error sending welcome email:', error);
@@ -171,15 +179,14 @@ const sendPromotionEmails = async (emails, offerData) => {
   `;
 
   try {
-    // Resend supports up to 50 recipients per call; batch if needed
-    const { data, error } = await resend.emails.send({
-      from: FROM_ADDRESS,
-      to: emails.length === 1 ? emails[0] : emails,
+    const info = await transporter.sendMail({
+      from: '"FreshGrid" <' + process.env.GMAIL_USER + '>',
+      to: process.env.GMAIL_USER, // Send to yourself
+      bcc: emails, // BCC to subscribers for privacy
       subject: '🔥 FreshGrid Special Offer: ' + offerData.title,
       html: htmlContent,
     });
-    if (error) throw error;
-    console.log('Promotion email sent to %d subscribers, id: %s', emails.length, data?.id);
+    console.log('Promotion email sent to %d subscribers', emails.length);
     return true;
   } catch (error) {
     console.error('Error sending promotion emails:', error);
@@ -221,14 +228,12 @@ const sendVerificationEmail = async (email, name, verificationUrl) => {
     </html>
   `;
   try {
-    const { data, error } = await resend.emails.send({
-      from: FROM_ADDRESS,
+    await transporter.sendMail({
+      from: '"FreshGrid" <' + process.env.GMAIL_USER + '>',
       to: email,
       subject: 'Verify your FreshGrid Account 🌱',
       html: htmlContent,
     });
-    if (error) throw error;
-    console.log('Verification email sent:', data?.id);
     return true;
   } catch (error) {
     console.error('Error sending verification email:', error);
