@@ -1,26 +1,48 @@
 const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
 const dns = require('dns');
-
-// Force IPv4 DNS resolution — Render free plan blocks outbound IPv6 connections
-dns.setDefaultResultOrder('ipv4first');
+const { promisify } = require('util');
 
 dotenv.config();
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,           // STARTTLS on port 587
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-  // Pass family:4 inside socketOptions — correct location in nodemailer v8.x
-  socketOptions: { family: 4 },
-});
+const resolve4 = promisify(dns.resolve4);
+
+// Cache the resolved IPv4 address so we don't re-query DNS every send
+let _smtpHost = null;
+
+/**
+ * Returns a nodemailer transporter guaranteed to use an IPv4 address.
+ * dns.resolve4() queries A-records ONLY — it cannot return an IPv6 address.
+ * This bypasses Render's Linux resolver which prefers AAAA (IPv6) records,
+ * causing ENETUNREACH since Render free plan blocks outbound IPv6.
+ */
+const getTransporter = async () => {
+  if (!_smtpHost) {
+    try {
+      const addresses = await resolve4('smtp.gmail.com');
+      _smtpHost = addresses[0];
+      console.log(`[EMAIL] Resolved smtp.gmail.com → IPv4: ${_smtpHost}`);
+    } catch (err) {
+      // Fallback: if resolve4 itself fails, use hostname and hope for the best
+      console.warn('[EMAIL] dns.resolve4 failed, using hostname fallback:', err.message);
+      _smtpHost = 'smtp.gmail.com';
+    }
+  }
+
+  return nodemailer.createTransport({
+    host: _smtpHost,
+    port: 587,
+    secure: false, // STARTTLS
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD,
+    },
+    tls: {
+      rejectUnauthorized: false,
+      servername: 'smtp.gmail.com', // SNI: validate TLS cert against hostname, not raw IP
+    },
+  });
+};
 
 const sendWelcomeEmail = async (email, name) => {
   const htmlContent = `
@@ -76,6 +98,7 @@ const sendWelcomeEmail = async (email, name) => {
   `;
 
   try {
+    const transporter = await getTransporter();
     const info = await transporter.sendMail({
       from: '"FreshGrid" <' + process.env.GMAIL_USER + '>',
       to: email,
@@ -184,6 +207,7 @@ const sendPromotionEmails = async (emails, offerData) => {
   `;
 
   try {
+    const transporter = await getTransporter();
     const info = await transporter.sendMail({
       from: '"FreshGrid" <' + process.env.GMAIL_USER + '>',
       to: process.env.GMAIL_USER, // Send to yourself
@@ -233,6 +257,7 @@ const sendVerificationEmail = async (email, name, verificationUrl) => {
     </html>
   `;
   try {
+    const transporter = await getTransporter();
     await transporter.sendMail({
       from: '"FreshGrid" <' + process.env.GMAIL_USER + '>',
       to: email,
