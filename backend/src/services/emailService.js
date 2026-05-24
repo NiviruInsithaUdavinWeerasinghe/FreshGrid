@@ -7,7 +7,10 @@ dns.setDefaultResultOrder('ipv4first'); // Force IPv4 to prevent Render IPv6 ENE
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  family: 4, // Force IPv4 routing specifically for this socket
   auth: {
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_APP_PASSWORD,
