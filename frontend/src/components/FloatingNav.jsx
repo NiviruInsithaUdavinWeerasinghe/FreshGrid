@@ -75,7 +75,7 @@ export default function FloatingNav() {
   const isHome = location.pathname === '/';
 
   return (
-    <div className="sticky top-24 z-40 container mx-auto px-4 sm:px-6 lg:px-8 pb-2 pointer-events-none">
+    <div className="mt-4 sticky top-24 z-40 container mx-auto px-4 sm:px-6 lg:px-8 pb-2 pointer-events-none">
       <div className="flex items-center gap-2 w-max pointer-events-auto">
         {!isHome && (
           <button 
