@@ -1,0 +1,197 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+  .dark body {
+    @apply bg-charcoal text-gray-100;
+  }
+}
+
+@layer components {
+  /*
+   * glass-panel — backdrop-blur is the #1 GPU killer.
+   * Replaced with solid semi-transparent backgrounds that look nearly identical
+   * but paint in a fraction of the time. No filter = no compositor layer cost.
+   */
+  .glass-panel {
+    @apply bg-white/95 border border-gray-200/80 shadow-lg
+           dark:bg-[#1c1c1c] dark:border-white/10;
+  }
+}
+
+/* Modal/popup animations — GPU-only properties (opacity + transform) */
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes scale-out {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.95); }
+}
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60%  { transform: translateX(-4px); }
+  40%, 80%  { transform: translateX(4px); }
+}
+
+.animate-scale-in  { animation: scale-in  0.25s cubic-bezier(0.16, 1, 0.3, 1) both; will-change: transform, opacity; }
+.animate-scale-out { animation: scale-out 0.2s ease-in  both; will-change: transform, opacity; }
+.animate-slide-up  { animation: slide-up  0.25s cubic-bezier(0.16, 1, 0.3, 1) both; will-change: transform, opacity; }
+.animate-shake     { animation: shake     0.30s ease-in-out both; will-change: transform; }
+.animate-fade-in   { animation: fade-in   0.25s cubic-bezier(0.16, 1, 0.3, 1) both; will-change: opacity; }
+.animate-fade-out  { animation: fade-out  0.2s ease-in  both; will-change: opacity; }
+
+/* Shop product catalog — horizontal page-slide transitions */
+@keyframes page-slide-out-left {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(-60px); }
+}
+@keyframes page-slide-out-right {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(60px); }
+}
+@keyframes page-slide-in-from-right {
+  from { opacity: 0; transform: translateX(60px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes page-slide-in-from-left {
+  from { opacity: 0; transform: translateX(-60px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.page-slide-out-left    { animation: page-slide-out-left    0.22s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.page-slide-out-right   { animation: page-slide-out-right   0.22s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.page-slide-in-from-right { animation: page-slide-in-from-right 0.28s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.page-slide-in-from-left  { animation: page-slide-in-from-left  0.28s cubic-bezier(0.4, 0, 0.2, 1) both; }
+
+/* Global route transition — plays on every page navigation */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: page-enter 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+  will-change: opacity, transform;
+}
+
+/* Cart item removal — slides right and fades out before DOM removal */
+@keyframes cart-item-exit {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+    max-height: 200px;
+    margin-bottom: 1rem;
+  }
+  60% {
+    opacity: 0;
+    transform: translateX(80px);
+    max-height: 200px;
+    margin-bottom: 1rem;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(80px);
+    max-height: 0;
+    margin-bottom: 0;
+    padding: 0;
+  }
+}
+
+.cart-item-exit {
+  animation: cart-item-exit 0.45s cubic-bezier(0.4, 0, 1, 1) both;
+  will-change: opacity, transform, max-height;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Promote modal overlays to their own compositor layer */
+.modal-overlay {
+  will-change: opacity;
+  contain: strict;
+}
+.modal-content {
+  will-change: transform, opacity;
+  contain: layout style;
+}
+
+/* Glowing background animations - Compositor Only */
+@keyframes border-pulse {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.6; }
+}
+
+.animate-border-pulse {
+  animation: border-pulse 5s ease-in-out infinite;
+  will-change: opacity;
+}
+
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Light mode scrollbar thumb */
+::-webkit-scrollbar-thumb {
+  background-color: rgba(107, 114, 128, 0.3); /* gray-500 with opacity */
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #059669; /* primary (emerald-600) */
+}
+
+/* Dark mode scrollbar thumb */
+.dark ::-webkit-scrollbar-thumb,
+.dark::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.25);
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background-clip: padding-box;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover,
+.dark::-webkit-scrollbar-thumb:hover {
+  background-color: #34d399; /* primary-light (emerald-400) */
+}
+
+/* Firefox scrollbar styles */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(107, 114, 128, 0.3) transparent;
+}
+
+.dark * {
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+
+
