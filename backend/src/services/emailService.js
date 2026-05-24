@@ -1,13 +1,16 @@
 const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
+const dns = require('dns');
+
+// Force IPv4 DNS resolution — Render free plan blocks outbound IPv6 connections
+dns.setDefaultResultOrder('ipv4first');
 
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',   // Explicit host — avoids service preset resolving to IPv6
+  host: 'smtp.gmail.com',
   port: 587,
-  secure: false,            // STARTTLS on port 587
-  family: 4,                // CRITICAL: force IPv4 — Render free plan blocks IPv6 outbound
+  secure: false,           // STARTTLS on port 587
   auth: {
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_APP_PASSWORD,
@@ -15,6 +18,8 @@ const transporter = nodemailer.createTransport({
   tls: {
     rejectUnauthorized: false,
   },
+  // Pass family:4 inside socketOptions — correct location in nodemailer v8.x
+  socketOptions: { family: 4 },
 });
 
 const sendWelcomeEmail = async (email, name) => {
