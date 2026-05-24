@@ -51,7 +51,7 @@ const sendWelcomeEmail = async (email, name) => {
           <p>Thank you for supporting local farmers and sustainable agriculture. We can't wait to deliver the best nature has to offer right to your kitchen.</p>
           
           <div class="cta-container">
-            <a href="http://localhost:5173/shop" class="cta-button">Shop Fresh Now</a>
+            <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/shop" class="cta-button">Shop Fresh Now</a>
           </div>
         </div>
         <div class="footer">
@@ -159,7 +159,7 @@ const sendPromotionEmails = async (emails, offerData) => {
           ${detailsHtml}
 
           <div class="cta-container">
-            <a href="http://localhost:5173/shop" class="cta-button">Claim Offer Now</a>
+            <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/shop" class="cta-button">Claim Offer Now</a>
           </div>
         </div>
         <div class="footer">

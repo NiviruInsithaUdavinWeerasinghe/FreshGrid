@@ -53,7 +53,7 @@ router.get(
   '/google/callback',
   passport.authenticate('google', {
     session: false,
-    failureRedirect: 'http://localhost:5173/login?error=oauth_failed',
+    failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=oauth_failed`,
   }),
   (req, res) => {
     const token = jwt.sign(
@@ -61,7 +61,7 @@ router.get(
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
     );
-    res.redirect(`http://localhost:5173/auth/callback?token=${token}`);
+    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/callback?token=${token}`);
   }
 );
 
@@ -78,7 +78,7 @@ router.get(
   '/facebook/callback',
   passport.authenticate('facebook', {
     session: false,
-    failureRedirect: 'http://localhost:5173/login?error=oauth_failed',
+    failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=oauth_failed`,
   }),
   (req, res) => {
     const token = jwt.sign(
@@ -86,7 +86,7 @@ router.get(
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
     );
-    res.redirect(`http://localhost:5173/auth/callback?token=${token}`);
+    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/callback?token=${token}`);
   }
 );
 

@@ -15,7 +15,7 @@ const emailService = require('../services/emailService');
 // Relying Party configs for Passkeys on localhost
 const rpName = 'FreshGrid';
 const rpID = 'localhost';
-const origin = 'http://localhost:5173';
+const origin = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 // Helpers
 const generateToken = (id, role = 'customer') => {
@@ -82,7 +82,7 @@ const registerUser = async (req, res) => {
     await user.save();
 
     // Dev Verification Link Logging
-    const verifyUrl = `http://localhost:5000/api/auth/verify-email/${verificationToken}`;
+    const verifyUrl = `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/auth/verify-email/${verificationToken}`;
     console.log('\n==================================================');
     console.log('✉️  FreshGrid Email Verification Link (Dev Mode):');
     console.log(verifyUrl);

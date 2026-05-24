@@ -13,6 +13,7 @@ dotenv.config(); // Load the environment variables from the .env file into proce
 require('./src/config/passport');
 
 const app = express(); // Create an instance of the express application
+app.set('trust proxy', 1); // Trust the first proxy (Render)
 const PORT = process.env.PORT || 5000; // Define the port, defaulting to 5000 if not set in environment
 
 // Connect to Database
