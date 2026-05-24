@@ -81,16 +81,14 @@ const registerUser = async (req, res) => {
 
     await user.save();
 
-    // Dev Verification Link Logging
     const verifyUrl = `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/auth/verify-email/${verificationToken}`;
-    console.log('\n==================================================');
-    console.log('✉️  FreshGrid Email Verification Link (Dev Mode):');
-    console.log(verifyUrl);
-    console.log('==================================================\n');
+    
+    // Send email asynchronously
+    emailService.sendVerificationEmail(emailLower, name, verifyUrl).catch(err => console.error("Email send failed:", err));
 
     res.status(201).json({
       success: true,
-      message: 'Registration successful! Please check your email console for the verification link.',
+      message: 'Registration successful! Please check your email inbox to verify your account.',
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

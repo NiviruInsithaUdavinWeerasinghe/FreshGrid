@@ -187,7 +187,55 @@ const sendPromotionEmails = async (emails, offerData) => {
   }
 };
 
+
+const sendVerificationEmail = async (email, name, verificationUrl) => {
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Verify your FreshGrid Account</title>
+      <style>
+        body { font-family: 'Inter', -apple-system, sans-serif; background-color: #f9fafb; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .header { background-color: #059669; padding: 40px 20px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 28px; font-weight: 800; }
+        .content { padding: 40px 30px; color: #374151; line-height: 1.6; font-size: 16px; text-align: center; }
+        .cta-button { display: inline-block; background-color: #059669; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 9999px; font-weight: bold; font-size: 16px; margin: 30px 0; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>🌱 FreshGrid</h1>
+        </div>
+        <div class="content">
+          <h2>Hello ${name}!</h2>
+          <p>Thanks for joining FreshGrid. We're excited to have you on board!</p>
+          <p>Please click the button below to verify your email address and activate your account.</p>
+          <a href="${verificationUrl}" class="cta-button">Verify Email Address</a>
+          <p style="font-size: 13px; color: #6b7280; margin-top: 30px;">If the button doesn't work, copy and paste this link into your browser:<br>${verificationUrl}</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+  try {
+    await transporter.sendMail({
+      from: '"FreshGrid" <' + process.env.GMAIL_USER + '>',
+      to: email,
+      subject: 'Verify your FreshGrid Account 🌱',
+      html: htmlContent,
+    });
+    return true;
+  } catch (error) {
+    console.error('Error sending verification email:', error);
+    return false;
+  }
+};
+
 module.exports = {
   sendWelcomeEmail,
   sendPromotionEmails,
+  sendVerificationEmail,
 };
