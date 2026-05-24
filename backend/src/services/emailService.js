@@ -1,5 +1,9 @@
 const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
+const dns = require('dns');
+
+dns.setDefaultResultOrder('ipv4first'); // Force IPv4 to prevent Render IPv6 ENETUNREACH issues
+
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
