@@ -7,7 +7,37 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <title>FreshGrid</title>
+    <!-- Primary SEO -->
+    <title>FreshGrid | Farm-Fresh Groceries Delivered</title>
+    <meta name="title" content="FreshGrid | Farm-Fresh Groceries Delivered" />
+    <meta name="description" content="FreshGrid delivers the freshest farm-to-table groceries directly to your doorstep. Explore our catalog of fresh fruits, vegetables, and daily essentials." />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://freshgrid.example.com/" />
+    <meta property="og:title" content="FreshGrid | Farm-Fresh Groceries Delivered" />
+    <meta property="og:description" content="FreshGrid delivers the freshest farm-to-table groceries directly to your doorstep. Explore our catalog of fresh fruits, vegetables, and daily essentials." />
+    <meta property="og:image" content="/favicon.svg" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://freshgrid.example.com/" />
+    <meta property="twitter:title" content="FreshGrid | Farm-Fresh Groceries Delivered" />
+    <meta property="twitter:description" content="FreshGrid delivers the freshest farm-to-table groceries directly to your doorstep. Explore our catalog of fresh fruits, vegetables, and daily essentials." />
+    <meta property="twitter:image" content="/favicon.svg" />
+    <script>
+      (function() {
+        try {
+          var savedTheme = localStorage.getItem('theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

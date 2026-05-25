@@ -115,7 +115,7 @@ const PromoBanner = () => {
 
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="flex items-center justify-between py-2.5 sm:py-3">
-              <div className="flex-1 flex items-center justify-center gap-3 sm:gap-4 md:gap-6 text-center sm:text-left">
+              <div className="flex-1 flex items-center justify-start gap-3 sm:gap-4 md:gap-6 text-left">
                 <span className="hidden sm:flex p-1.5 bg-white/20 rounded-lg backdrop-blur-md shadow-inner">
                   {getIcon(currentOffer.offerType)}
                 </span>
@@ -129,7 +129,7 @@ const PromoBanner = () => {
                     transition={{ duration: 0.3 }}
                     className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3"
                   >
-                    <div className="flex items-center justify-center gap-2">
+                    <div className="flex items-center justify-start gap-2">
                       <Sparkles size={14} className="text-yellow-300 sm:hidden" />
                       <span className="font-black tracking-wide text-sm sm:text-base text-yellow-300 drop-shadow-md uppercase">
                         {currentOffer.title}
@@ -143,7 +143,7 @@ const PromoBanner = () => {
                       <button
                         onClick={() => handleAddToCart(currentOffer._id)}
                         disabled={addingId === currentOffer._id}
-                        className="ml-2 sm:ml-4 px-3 py-1 bg-yellow-400 hover:bg-yellow-300 text-teal-900 text-xs font-black uppercase rounded-lg shadow-md transition-all flex items-center gap-1.5 disabled:opacity-75 disabled:cursor-not-allowed"
+                        className="mt-2 sm:mt-0 sm:ml-4 px-3 py-1 bg-yellow-400 hover:bg-yellow-300 text-teal-900 text-xs font-black uppercase rounded-lg shadow-md transition-all flex items-center justify-start gap-1.5 disabled:opacity-75 disabled:cursor-not-allowed w-max"
                       >
                         {addingId === currentOffer._id ? (
                           <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>

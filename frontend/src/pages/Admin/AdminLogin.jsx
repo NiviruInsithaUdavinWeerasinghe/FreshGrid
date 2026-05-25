@@ -16,11 +16,15 @@ const AdminLogin = () => {
     setError('');
     setLoading(true);
 
-    setTimeout(() => {
-      const success = login(username, password);
-      if (success) {
-        navigate('/admin/dashboard');
-      } else {
+    setTimeout(async () => {
+      try {
+        const success = await login(username, password);
+        if (success) {
+          navigate('/admin/dashboard');
+        } else {
+          setError('Invalid username or password. Please try again.');
+        }
+      } catch (err) {
         setError('Invalid username or password. Please try again.');
       }
       setLoading(false);

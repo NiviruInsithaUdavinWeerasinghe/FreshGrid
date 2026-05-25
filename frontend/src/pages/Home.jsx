@@ -12,7 +12,8 @@ const Home = () => {
       try {
         const response = await axios.get((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/products');
         if (response.data.success) {
-          const allProducts = response.data.data;
+          // Filter out out-of-stock products
+          const allProducts = response.data.data.filter(p => p.inStock !== false);
           
           // Get unique categories
           const categories = [...new Set(allProducts.map(p => p.category))];
@@ -57,8 +58,8 @@ const Home = () => {
           <div className="inline-block px-4 py-1.5 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light font-medium rounded-full text-sm border border-primary/20">
             100% Organic & Local
           </div>
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
-            Farm Fresh to <br/>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
+            Farm Fresh to <br className="hidden sm:block"/>
             <span className="text-primary dark:text-primary-light">Your Door</span>
           </h1>
           <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-lg">
@@ -80,7 +81,7 @@ const Home = () => {
           </div>
         </div>
         
-        <div className="lg:w-1/2 relative">
+        <div className="hidden lg:block lg:w-1/2 relative">
           <div className="absolute inset-0 bg-primary/20 dark:bg-primary/10 rounded-full blur-3xl transform translate-x-10 translate-y-10"></div>
           <img 
             src="/images/hero-farm.png" 
@@ -102,10 +103,10 @@ const Home = () => {
           </Link>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="flex overflow-x-auto sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 pb-4 snap-x snap-mandatory" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {loading ? (
             Array.from({ length: 3 }).map((_, idx) => (
-              <div key={idx} className="glass-panel rounded-2xl overflow-hidden border border-gray-200/50 dark:border-white/5 animate-pulse flex flex-col h-[400px]">
+              <div key={idx} className="min-w-[75vw] sm:min-w-0 snap-center shrink-0 glass-panel rounded-2xl overflow-hidden border border-gray-200/50 dark:border-white/5 animate-pulse flex flex-col h-[400px]">
                 <div className="h-48 bg-gray-200 dark:bg-white/5 w-full" />
                 <div className="p-5 space-y-3 flex-grow flex flex-col justify-between">
                   <div className="space-y-2">
@@ -121,7 +122,9 @@ const Home = () => {
             ))
           ) : (
             featuredProducts.map(product => (
-              <ProductCard key={product._id || product.id} product={product} />
+              <div key={product._id || product.id} className="min-w-[75vw] sm:min-w-0 snap-center shrink-0">
+                <ProductCard product={product} />
+              </div>
             ))
           )}
         </div>
@@ -140,18 +143,18 @@ const Home = () => {
           <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">From the soil to your kitchen in three simple steps.</p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
-          <div className="space-y-4">
+        <div className="flex overflow-x-auto md:grid md:grid-cols-3 gap-6 md:gap-12 pb-4 snap-x snap-mandatory text-center" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <div className="w-full md:w-auto space-y-4 snap-center shrink-0">
             <div className="w-16 h-16 mx-auto bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light rounded-2xl flex items-center justify-center text-2xl font-bold">1</div>
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">Browse & Order</h3>
             <p className="text-gray-600 dark:text-gray-400">Choose from a wide variety of fresh, locally sourced products.</p>
           </div>
-          <div className="space-y-4">
+          <div className="w-full md:w-auto space-y-4 snap-center shrink-0">
             <div className="w-16 h-16 mx-auto bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light rounded-2xl flex items-center justify-center text-2xl font-bold">2</div>
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">Farmers Harvest</h3>
             <p className="text-gray-600 dark:text-gray-400">Our partner farmers pick your items fresh upon receiving the order.</p>
           </div>
-          <div className="space-y-4">
+          <div className="w-full md:w-auto space-y-4 snap-center shrink-0">
             <div className="w-16 h-16 mx-auto bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light rounded-2xl flex items-center justify-center text-2xl font-bold">3</div>
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">Doorstep Delivery</h3>
             <p className="text-gray-600 dark:text-gray-400">Receive your fresh produce at your doorstep the very next morning.</p>

@@ -169,12 +169,48 @@ const Cart = () => {
     <div className="pb-8 max-w-6xl mx-auto">
 
       {/* Page Header */}
-      <div className="flex items-center gap-3 mb-8">
-        <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100">Your Cart</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div className="flex items-center gap-3">
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100">Your Cart</h1>
+          {!cartLoading && cartItems.length > 0 && (
+            <span className="bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light text-xs font-bold px-3 py-1 rounded-full">
+              {cartItems.reduce((s, i) => s + i.quantity, 0)} items
+            </span>
+          )}
+        </div>
+
+        {/* Empty Cart Section */}
         {!cartLoading && cartItems.length > 0 && (
-          <span className="bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light text-xs font-bold px-3 py-1 rounded-full">
-            {cartItems.reduce((s, i) => s + i.quantity, 0)} items
-          </span>
+          <div className="w-full sm:w-auto">
+            {!pendingClearCart ? (
+              <button
+                onClick={() => setPendingClearCart(true)}
+                className="w-full sm:w-auto px-6 py-2.5 sm:py-2 bg-transparent border-2 border-red-500/20 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 font-semibold rounded-xl transition-all duration-200"
+              >
+                Empty Cart
+              </button>
+            ) : (
+              <div className="bg-red-50 dark:bg-red-500/10 rounded-xl p-3 animate-in fade-in slide-in-from-top-2 w-full sm:w-auto shadow-sm border border-red-100 dark:border-red-500/20 flex flex-col sm:flex-row items-center gap-3">
+                <p className="text-sm font-bold text-red-600 dark:text-red-400 mb-0 whitespace-nowrap text-center sm:text-left">
+                  Empty the entire cart?
+                </p>
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <button
+                    onClick={() => setPendingClearCart(false)}
+                    className="flex-1 sm:flex-none px-4 py-1.5 text-xs font-bold rounded-lg border border-red-200 dark:border-red-500/20 text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-white/5 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmClearCart}
+                    className="flex-1 sm:flex-none px-4 py-1.5 text-xs font-bold rounded-lg bg-red-500 hover:bg-red-600 text-white transition-colors shadow-sm shadow-red-500/20"
+                  >
+                    Yes, Empty
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         )}
       </div>
 
@@ -203,36 +239,39 @@ const Cart = () => {
                   className={`glass-panel rounded-2xl overflow-hidden transition-shadow hover:shadow-lg hover:shadow-primary/5 ${isExiting ? 'cart-item-exit' : ''}`}
                 >
                   {/* ── Main item row ── */}
-                  <div className="p-4 flex items-center gap-4">
+                  <div className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                    <div className="flex items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
                     {/* Product Image */}
                     <img
                       src={imageSrc}
                       alt={product?.name}
-                      className="w-24 h-24 object-cover rounded-xl flex-shrink-0"
+                      className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-xl flex-shrink-0"
                     />
 
                     {/* Product Info */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 truncate">
+                      <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-gray-100 truncate">
                         {product?.name}
                       </h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{product?.category}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <div className="text-primary dark:text-primary-light font-semibold text-sm">
+                      <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5">{product?.category}</p>
+                      <div className="flex flex-wrap items-center gap-1 sm:gap-2 mt-1">
+                        <div className="text-primary dark:text-primary-light font-semibold text-xs sm:text-sm">
                           Rs. {Number(product?.price ?? 0).toFixed(2)} / {product?.unit || 'kg'}
                         </div>
                         {product?.originalPrice && product.originalPrice > product.price && (
-                          <>
-                            <span className="text-xs text-gray-400 line-through">Rs. {Number(product.originalPrice).toFixed(2)}</span>
-                            <span className="text-[10px] bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Volume Discount</span>
-                          </>
+                          <div className="flex items-center gap-1">
+                            <span className="text-[10px] sm:text-xs text-gray-400 line-through">Rs. {Number(product.originalPrice).toFixed(2)}</span>
+                            <span className="text-[9px] sm:text-[10px] bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 px-1 py-0.5 rounded font-bold uppercase tracking-wider">Vol. Discount</span>
+                          </div>
                         )}
                       </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 font-medium">
+                      <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 font-medium">
                         Subtotal: <span className="text-gray-800 dark:text-gray-200 font-bold">Rs. {(Number(product?.price ?? 0) * item.quantity).toFixed(2)}</span>
                       </div>
                     </div>
+                    </div>
 
+                    <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto mt-2 sm:mt-0 px-1 sm:px-0">
                     {/* Quantity Stepper */}
                     <div className="flex items-center gap-1 bg-gray-100 dark:bg-charcoal rounded-xl px-1 py-1 border border-gray-200 dark:border-white/5 flex-shrink-0">
                       <button
@@ -266,6 +305,7 @@ const Cart = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
                     </button>
+                    </div>
                   </div>
 
                   {/* ── Inline confirmation bar (slides down when pending) ── */}
@@ -520,37 +560,6 @@ const Cart = () => {
                 ← Continue Shopping
               </Link>
 
-              {/* Empty Cart Section */}
-              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-white/10">
-                {!pendingClearCart ? (
-                  <button
-                    onClick={() => setPendingClearCart(true)}
-                    className="w-full py-2.5 bg-transparent border-2 border-red-500/20 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 font-semibold rounded-xl transition-all duration-200"
-                  >
-                    Empty Cart
-                  </button>
-                ) : (
-                  <div className="bg-red-50 dark:bg-red-500/10 rounded-xl p-4 animate-in fade-in slide-in-from-top-2">
-                    <p className="text-sm font-bold text-red-600 dark:text-red-400 mb-3 text-center">
-                      Empty the entire cart?
-                    </p>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setPendingClearCart(false)}
-                        className="flex-1 py-2 text-xs font-bold rounded-lg border border-red-200 dark:border-red-500/20 text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-white/5 transition-colors"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={confirmClearCart}
-                        className="flex-1 py-2 text-xs font-bold rounded-lg bg-red-500 hover:bg-red-600 text-white transition-colors"
-                      >
-                        Yes, Empty It
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
             </div>
           </div>
         )}

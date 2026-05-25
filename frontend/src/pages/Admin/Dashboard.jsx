@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -76,8 +76,7 @@ const OverviewPanel = ({ onNavigate, data, loading }) => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Dashboard Overview</h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Welcome back, Admin. Here's what's happening today.</p>
+        <p className="text-gray-500 dark:text-gray-400 text-sm">Welcome back, Admin. Here's what's happening today.</p>
       </div>
 
       {/* Stats Row */}
@@ -202,7 +201,7 @@ const OverviewPanel = ({ onNavigate, data, loading }) => {
 };
 
 /* ─── Sidebar ─── */
-const Sidebar = ({ activePage, onNavigate, onLogout, productCount, orderCount, offerCount }) => {
+const Sidebar = ({ activePage, onNavigate, onLogout, productCount, orderCount, offerCount, isOpen, setIsOpen }) => {
   const navItems = [
     {
       id: 'overview',
@@ -246,7 +245,15 @@ const Sidebar = ({ activePage, onNavigate, onLogout, productCount, orderCount, o
   ];
 
   return (
-    <aside className="w-64 bg-white dark:bg-[#161616] border-r border-gray-200 dark:border-white/5 hidden md:flex flex-col sticky top-0 h-screen">
+    <>
+      {/* Mobile overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+      <aside className={`fixed md:sticky top-0 left-0 z-50 h-screen w-64 bg-white dark:bg-[#161616] border-r border-gray-200 dark:border-white/5 flex flex-col transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
       {/* Brand */}
       <div className="h-[84px] px-6 flex flex-col justify-center border-b border-gray-200 dark:border-white/5">
         <Link to="/" className="flex items-center gap-2 text-xl font-bold text-primary dark:text-primary-light hover:opacity-80 transition-opacity">
@@ -299,6 +306,7 @@ const Sidebar = ({ activePage, onNavigate, onLogout, productCount, orderCount, o
         </button>
       </div>
     </aside>
+    </>
   );
 };
 
@@ -312,6 +320,7 @@ const Dashboard = () => {
   const setActivePage = (page) => {
     setSearchParams({ tab: page });
   };
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const [dashboardData, setDashboardData] = useState({
     products: [],
@@ -346,7 +355,11 @@ const Dashboard = () => {
   }, [isAdminLoggedIn]);
 
   // ─ Dark mode (shared with customer Navbar via localStorage) ────────────────
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = localStorage.getItem('theme');
+    if (saved) return saved === 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
 
   useEffect(() => {
     const saved = localStorage.getItem('theme');
@@ -384,8 +397,7 @@ const Dashboard = () => {
 
   // Redirect if not logged in
   if (!isAdminLoggedIn) {
-    navigate('/admin');
-    return null;
+    return <Navigate to="/admin" replace />;
   }
 
   const handleLogout = () => {
@@ -404,19 +416,33 @@ const Dashboard = () => {
     <div className="h-screen overflow-hidden bg-gray-50 dark:bg-charcoal flex">
       <Sidebar
         activePage={activePage}
-        onNavigate={setActivePage}
+        onNavigate={(page) => {
+          setActivePage(page);
+          setIsMobileMenuOpen(false);
+        }}
         onLogout={handleLogout}
         productCount={dashboardData.products.length}
         orderCount={dashboardData.orders.length}
         offerCount={dashboardData.offers.length}
+        isOpen={isMobileMenuOpen}
+        setIsOpen={setIsMobileMenuOpen}
       />
 
       {/* Main content */}
       <main className="flex-1 overflow-y-auto">
         {/* Top bar */}
-        <header className="sticky top-0 z-10 bg-white dark:bg-[#1a1a1a] border-b border-gray-200 dark:border-white/5 px-8 h-[84px] flex items-center justify-between">
+        <header className="sticky top-0 z-10 bg-white dark:bg-[#1a1a1a] border-b border-gray-200 dark:border-white/5 px-4 sm:px-8 h-[84px] flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-            <span className="font-semibold text-gray-900 dark:text-gray-100">{pageTitles[activePage]}</span>
+            <button 
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="p-2 -ml-2 mr-1 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 md:hidden"
+              aria-label="Open sidebar"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <span className="text-xl font-bold text-gray-900 dark:text-gray-100 truncate">{pageTitles[activePage]}</span>
           </div>
           <div className="flex items-center gap-2">
             {/* Dark mode toggle */}

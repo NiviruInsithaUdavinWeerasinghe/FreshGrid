@@ -46,28 +46,28 @@ const ProductCard = ({ product, onClick }) => {
       onClick={() => onClick && onClick(product)}
       className="glass-panel rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-primary/10 transition-shadow duration-200 group flex flex-col h-full cursor-pointer relative"
     >
-      <div className="relative h-48 overflow-hidden">
+      <div className="relative h-32 sm:h-48 overflow-hidden">
         <img 
           src={product.images?.[0] || product.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=600'} 
           alt={product.name} 
           loading="lazy"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
         />
-        <div className="absolute top-3 left-3 bg-white/95 dark:bg-[#1c1c1c]/95 px-3 py-1 rounded-full text-xs font-semibold text-primary dark:text-primary-light border border-gray-200/50 dark:border-white/10">
+        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-white/95 dark:bg-[#1c1c1c]/95 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold text-primary dark:text-primary-light border border-gray-200/50 dark:border-white/10">
           {product.category}
         </div>
       </div>
       
-      <div className="p-5 flex flex-col flex-grow">
-        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">{product.name}</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-grow line-clamp-2">
+      <div className="p-3 sm:p-5 flex flex-col flex-grow">
+        <h3 className="text-sm sm:text-lg font-bold text-gray-900 dark:text-gray-100 mb-1 truncate">{product.name}</h3>
+        <p className="text-[10px] sm:text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-4 flex-grow line-clamp-2">
           {product.description}
         </p>
         
-        <div className="flex items-center justify-between mt-auto">
-          <span className="text-xl font-bold text-gray-900 dark:text-white">
+        <div className="flex items-center justify-between mt-auto gap-1 sm:gap-2">
+          <span className="text-sm sm:text-xl font-bold text-gray-900 dark:text-white min-w-0 truncate">
             Rs. {Number(product.price).toFixed(2)}
-            <span className="text-xs font-normal text-gray-500 dark:text-gray-400 ml-1">/ {product.unit || 'kg'}</span>
+            <span className="text-[10px] sm:text-xs font-normal text-gray-500 dark:text-gray-400 ml-1">/ {product.unit || 'kg'}</span>
           </span>
 
           {inCart ? (

@@ -392,7 +392,7 @@ import ReactDOM from 'react-dom';
               {form.offerType === 'BUNDLE_PACKAGE' && (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5 flex items-center justify-between">
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5 flex flex-col sm:flex-row sm:items-center justify-between items-start gap-1 sm:gap-2">
                       <span>Flat Bundle Price (LKR) *</span>
                       {originalBundleValue > 0 && (
                         <span className="text-[10px] bg-gray-100 dark:bg-white/10 px-2 py-0.5 rounded text-gray-600 dark:text-gray-300">
@@ -411,36 +411,38 @@ import ReactDOM from 'react-dom';
                   </div>
                   <div>
                     <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">Bundle Products *</label>
-                    <div className="space-y-3 mb-3">
-                      {(form.config.bundleProducts || []).map((bp, i) => {
-                        const selectedProd = products.find(p => p._id === bp.productId);
-                        const itemTotal = selectedProd ? Number(selectedProd.price) * Number(bp.quantity || 1) : 0;
-                        return (
-                          <div key={i} className="flex items-center gap-2">
-                            <div className="flex-[2] min-w-[120px]">
-                              <CustomDropdown
-                                value={bp.productId}
-                                onChange={val => handleUpdateBundleItem(i, 'productId', val)}
-                                options={[
-                                  { value: "", label: "Select Product" },
-                                  ...sortedProducts
-                                    .filter(p => p._id === bp.productId || !(form.config.bundleProducts || []).some((otherBp, index) => index !== i && otherBp.productId === p._id))
-                                    .map(p => ({ value: p._id, label: p.name }))
-                                ]}
-                                error={!bp.productId}
-                              />
+                    <div className="overflow-x-auto pb-2 mb-3">
+                      <div className="space-y-3 min-w-[380px] sm:min-w-0">
+                        {(form.config.bundleProducts || []).map((bp, i) => {
+                          const selectedProd = products.find(p => p._id === bp.productId);
+                          const itemTotal = selectedProd ? Number(selectedProd.price) * Number(bp.quantity || 1) : 0;
+                          return (
+                            <div key={i} className="flex items-center gap-2">
+                              <div className="flex-[2] min-w-[120px]">
+                                <CustomDropdown
+                                  value={bp.productId}
+                                  onChange={val => handleUpdateBundleItem(i, 'productId', val)}
+                                  options={[
+                                    { value: "", label: "Select Product" },
+                                    ...sortedProducts
+                                      .filter(p => p._id === bp.productId || !(form.config.bundleProducts || []).some((otherBp, index) => index !== i && otherBp.productId === p._id))
+                                      .map(p => ({ value: p._id, label: p.name }))
+                                  ]}
+                                  error={!bp.productId}
+                                />
+                              </div>
+                              <input required type="number" min="1" value={bp.quantity} onChange={e => handleUpdateBundleItem(i, 'quantity', e.target.value)} className="w-20 px-3 py-2 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-primary outline-none" placeholder="Qty" />
+                              <div className="w-24 sm:w-28 relative">
+                                <span className="absolute left-2.5 top-2.5 text-gray-400 text-xs sm:text-sm font-bold">Rs.</span>
+                                <input type="text" readOnly value={selectedProd ? itemTotal.toFixed(2) : '0.00'} className="w-full pl-7 sm:pl-8 pr-2 py-2 bg-gray-100 dark:bg-white/10 border border-gray-200 dark:border-white/10 rounded-xl text-xs sm:text-sm text-gray-500 font-semibold outline-none cursor-not-allowed" title="Original Line Item Value" />
+                              </div>
+                              <button type="button" onClick={() => handleRemoveBundleItem(i)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                              </button>
                             </div>
-                            <input required type="number" min="1" value={bp.quantity} onChange={e => handleUpdateBundleItem(i, 'quantity', e.target.value)} className="w-20 px-3 py-2 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-primary outline-none" placeholder="Qty" />
-                            <div className="w-24 sm:w-28 relative">
-                              <span className="absolute left-2.5 top-2.5 text-gray-400 text-xs sm:text-sm font-bold">Rs.</span>
-                              <input type="text" readOnly value={selectedProd ? itemTotal.toFixed(2) : '0.00'} className="w-full pl-7 sm:pl-8 pr-2 py-2 bg-gray-100 dark:bg-white/10 border border-gray-200 dark:border-white/10 rounded-xl text-xs sm:text-sm text-gray-500 font-semibold outline-none cursor-not-allowed" title="Original Line Item Value" />
-                            </div>
-                            <button type="button" onClick={() => handleRemoveBundleItem(i)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors flex-shrink-0">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                            </button>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
                     </div>
                     <button type="button" onClick={handleAddBundleItem} className="px-4 py-2 bg-primary/10 text-primary hover:bg-primary/20 font-semibold text-sm rounded-xl transition-colors">
                       + Add Product to Package
@@ -566,25 +568,25 @@ const SpecialOffers = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Special Offers</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Manage promotions, bundles, and delivery subsidies.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Manage promotions, bundles, and delivery subsidies.</p>
         </div>
-        <button onClick={() => setModal('add')} className="bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-primary-light shadow-lg shadow-primary/20 transition-all flex items-center gap-2">
+        <button onClick={() => setModal('add')} className="w-full sm:w-auto justify-center bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-primary-light shadow-lg shadow-primary/20 transition-all flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
           Create Offer
         </button>
       </div>
 
       <div className="glass-panel rounded-2xl overflow-hidden shadow-sm">
+        <div className="overflow-x-auto">
         <table className="w-full text-left">
           <thead>
             <tr className="bg-gray-50/80 dark:bg-white/5 border-b border-gray-200 dark:border-white/5">
-              <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title & Type</th>
-              <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Validity</th>
-              <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">Actions</th>
+              <th className="px-4 py-3 sm:px-6 sm:py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title & Type</th>
+              <th className="px-4 py-3 sm:px-6 sm:py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Validity</th>
+              <th className="px-4 py-3 sm:px-6 sm:py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+              <th className="px-4 py-3 sm:px-6 sm:py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-white/5">
@@ -592,31 +594,41 @@ const SpecialOffers = () => {
               const isActiveNow = new Date() >= new Date(offer.validFrom) && new Date() <= new Date(offer.validTo);
               return (
                 <tr key={offer._id} className="hover:bg-gray-50/80 dark:hover:bg-white/5 transition-colors">
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3 sm:px-6 sm:py-4">
                     <div className="text-sm font-bold text-gray-900 dark:text-gray-100">{offer.title}</div>
                     <div className="text-xs font-medium text-primary mt-0.5">{offer.offerType.replace(/_/g, ' ')}</div>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="text-xs text-gray-600 dark:text-gray-300">From: {new Date(offer.validFrom).toLocaleDateString()}</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-300">To: {new Date(offer.validTo).toLocaleDateString()}</div>
-                    {isActiveNow && offer.isActive && <span className="inline-block mt-1 px-2 py-0.5 bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400 text-[10px] font-bold rounded-md">CURRENTLY ACTIVE</span>}
+                  <td className="px-4 py-3 sm:px-6 sm:py-4">
+                    <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-300">From: {new Date(offer.validFrom).toLocaleDateString()}</div>
+                    <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-300">To: {new Date(offer.validTo).toLocaleDateString()}</div>
+                    {isActiveNow && offer.isActive && <span className="inline-block mt-1 px-1.5 py-0.5 sm:px-2 sm:py-0.5 bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400 text-[9px] sm:text-[10px] font-bold rounded-md">CURRENTLY ACTIVE</span>}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3 sm:px-6 sm:py-4">
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input type="checkbox" checked={offer.isActive} onChange={() => handleToggleActive(offer)} className="sr-only peer" />
                       <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-white/10 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
                     </label>
                   </td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-4 py-3 sm:px-6 sm:py-4 text-right">
                     {confirmDelete === offer._id ? (
-                      <div className="flex items-center justify-end gap-2 animate-slide-up">
-                        <button onClick={() => setConfirmDelete(null)} className="px-3 py-1.5 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-white/5 dark:hover:bg-white/10 rounded-lg transition-colors">Cancel</button>
-                        <button onClick={() => handleDelete(offer._id)} className="px-3 py-1.5 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors shadow-sm shadow-red-500/20">Confirm Delete</button>
+                      <div className="flex flex-col sm:flex-row items-end sm:items-center justify-end gap-1 sm:gap-2 animate-slide-up">
+                        <button onClick={() => setConfirmDelete(null)} className="px-2 py-1 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-white/5 dark:hover:bg-white/10 rounded-lg transition-colors">Cancel</button>
+                        <button onClick={() => handleDelete(offer._id)} className="px-2 py-1 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors shadow-sm shadow-red-500/20">Confirm</button>
                       </div>
                     ) : (
-                      <div className="flex items-center justify-end gap-2">
-                        <button onClick={() => setModal(offer)} className="px-3 py-1.5 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 rounded-lg transition-colors">Edit</button>
-                        <button onClick={() => setConfirmDelete(offer._id)} className="px-3 py-1.5 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 dark:text-red-400 dark:bg-red-500/10 dark:hover:bg-red-500/20 rounded-lg transition-colors">Delete</button>
+                      <div className="flex items-center justify-end gap-1.5 sm:gap-2">
+                        <button onClick={() => setModal(offer)} className="inline-flex items-center justify-center p-1.5 sm:px-3 sm:py-1.5 gap-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 rounded-lg transition-colors">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-3.5 sm:w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                          <span className="hidden sm:inline">Edit</span>
+                        </button>
+                        <button onClick={() => setConfirmDelete(offer._id)} className="inline-flex items-center justify-center p-1.5 sm:px-3 sm:py-1.5 gap-1.5 text-xs font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 rounded-lg transition-colors">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-3.5 sm:w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                          <span className="hidden sm:inline">Delete</span>
+                        </button>
                       </div>
                     )}
                   </td>
@@ -630,6 +642,7 @@ const SpecialOffers = () => {
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       {modal && ReactDOM.createPortal(

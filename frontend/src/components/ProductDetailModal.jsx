@@ -75,12 +75,20 @@ const ProductDetailModal = ({ product, onClose }) => {
       <div className="absolute inset-0 bg-black/80" onClick={handleClose} />
       
       <div 
-        className={`relative w-full max-w-4xl mx-auto flex flex-col md:flex-row bg-white dark:bg-[#111315] rounded-[1.5rem] overflow-hidden shadow-2xl border border-gray-200/50 dark:border-white/10 ${closing ? "animate-scale-out" : "animate-scale-in"}`}
+        className={`relative w-full max-w-4xl mx-auto flex flex-col md:flex-row bg-white dark:bg-[#111315] rounded-[1.5rem] overflow-hidden shadow-2xl border border-gray-200/50 dark:border-white/10 max-h-[80vh] md:max-h-[550px] ${closing ? "animate-scale-out" : "animate-scale-in"}`}
         onClick={(e) => e.stopPropagation()}
-        style={{ maxHeight: '85vh' }}
       >
+        <button 
+          onClick={handleClose}
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 z-50 p-2 bg-black/40 text-white md:bg-gray-100 hover:bg-black/60 md:hover:bg-gray-200 dark:md:bg-white/5 dark:md:hover:bg-white/10 md:text-gray-600 dark:md:text-gray-300 backdrop-blur-md md:backdrop-blur-none rounded-full transition-all duration-200 hover:rotate-90 hover:scale-110"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
         {/* Image Side (Left) */}
-        <div className="w-full md:w-[45%] relative bg-gray-100 dark:bg-[#16181a] flex-shrink-0 min-h-[250px] md:min-h-0">
+        <div className="w-full md:w-[45%] relative bg-gray-100 dark:bg-[#16181a] flex-shrink-0 h-52 sm:h-64 md:h-auto">
           <img 
             src={product.images?.[0] || product.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=600'} 
             alt={product.name} 
@@ -107,21 +115,12 @@ const ProductDetailModal = ({ product, onClose }) => {
 
         {/* Content Side (Right) */}
         <div className="w-full md:w-[55%] flex flex-col relative bg-white dark:bg-charcoal overflow-y-auto custom-scrollbar">
-          <button 
-            onClick={handleClose}
-            className="absolute top-4 right-4 z-10 p-2 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 rounded-full transition-all duration-200 hover:rotate-90 hover:scale-110"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-
-          <div className="p-6 md:p-8 flex-grow flex flex-col">
-            <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight pr-8 leading-tight">
+          <div className="p-4 sm:p-6 md:p-8 flex-grow flex flex-col">
+            <h2 className="text-xl md:text-3xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight pr-0 md:pr-8 leading-tight">
               {product.name}
             </h2>
             
-            <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm mb-6 leading-relaxed">
+            <p className="text-gray-600 dark:text-gray-400 text-[11px] md:text-sm mb-4 md:mb-6 leading-relaxed">
               {product.description}
             </p>
 
@@ -134,9 +133,9 @@ const ProductDetailModal = ({ product, onClose }) => {
             )}
 
             {/* Price Block */}
-            <div className="flex items-end gap-2 mb-6 pb-6 border-b border-gray-200 dark:border-white/5 flex-wrap">
-              <span className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tighter">
-                <span className="text-base text-gray-400 mr-1 font-bold">Rs.</span>
+            <div className="flex items-end gap-2 mb-4 md:mb-6 pb-4 md:pb-6 border-b border-gray-200 dark:border-white/5 flex-wrap">
+              <span className="text-xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tighter">
+                <span className="text-sm md:text-base text-gray-400 mr-1 font-bold">Rs.</span>
                 {Number(product.price).toFixed(2)}
               </span>
               

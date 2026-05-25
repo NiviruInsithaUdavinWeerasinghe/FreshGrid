@@ -255,8 +255,7 @@ const OrdersManagement = () => {
     <div ref={containerRef} className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Order Management</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Track, review, and update customer orders.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Track, review, and update customer orders.</p>
         </div>
 
         {/* Status Filters */}
@@ -319,37 +318,42 @@ const OrdersManagement = () => {
               </div>
 
               {/* Order Body */}
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                  <div className="flex items-center gap-3">
-                    <StatusBadge status={order.status} />
-                    
-                    <CustomDropdown 
-                      value={order.status}
-                      onChange={(val) => handleStatusChange(order._id, val)}
-                      options={[
-                        { value: 'Processing', label: 'Processing' },
-                        { value: 'Shipped', label: 'Shipped' },
-                        { value: 'Delivered', label: 'Delivered' },
-                        { value: 'Cancelled', label: 'Cancelled' }
-                      ]}
-                    />
-
-                    <div className="h-6 w-px bg-gray-200 dark:bg-white/10 mx-2"></div>
-
-                    <PaymentBadge method={order.paymentMethod} status={order.paymentStatus} />
-                    {order.paymentMethod?.toLowerCase() !== 'card' && (
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                    {/* Order Status Group */}
+                    <div className="flex items-center gap-3">
+                      <StatusBadge status={order.status} />
                       <CustomDropdown 
-                        value={order.paymentStatus || 'Pending'}
-                        onChange={(val) => handlePaymentStatusChange(order._id, val)}
+                        value={order.status}
+                        onChange={(val) => handleStatusChange(order._id, val)}
                         options={[
-                          { value: 'Pending', label: 'Pending' },
-                          { value: 'Paid', label: 'Paid' },
-                          { value: 'Failed', label: 'Failed' },
-                          { value: 'Refunded', label: 'Refunded' }
+                          { value: 'Processing', label: 'Processing' },
+                          { value: 'Shipped', label: 'Shipped' },
+                          { value: 'Delivered', label: 'Delivered' },
+                          { value: 'Cancelled', label: 'Cancelled' }
                         ]}
                       />
-                    )}
+                    </div>
+
+                    <div className="hidden sm:block h-6 w-px bg-gray-200 dark:bg-white/10"></div>
+
+                    {/* Payment Status Group */}
+                    <div className="flex items-center gap-3">
+                      <PaymentBadge method={order.paymentMethod} status={order.paymentStatus} />
+                      {order.paymentMethod?.toLowerCase() !== 'card' && (
+                        <CustomDropdown 
+                          value={order.paymentStatus || 'Pending'}
+                          onChange={(val) => handlePaymentStatusChange(order._id, val)}
+                          options={[
+                            { value: 'Pending', label: 'Pending' },
+                            { value: 'Paid', label: 'Paid' },
+                            { value: 'Failed', label: 'Failed' },
+                            { value: 'Refunded', label: 'Refunded' }
+                          ]}
+                        />
+                      )}
+                    </div>
                   </div>
                   
                   <button

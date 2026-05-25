@@ -620,16 +620,13 @@ const ProductsManagement = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            Product Management
-          </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             {products.length} products in catalog
           </p>
         </div>
         <button
           onClick={() => setModal({ type: "add", product: null })}
-          className="inline-flex items-center gap-2 bg-primary hover:bg-primary-light text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30"
+          className="w-full sm:w-auto justify-center inline-flex items-center gap-2 bg-primary hover:bg-primary-light text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -710,19 +707,19 @@ const ProductsManagement = () => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-50/80 dark:bg-white/5 border-b border-gray-200 dark:border-white/5">
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-4 py-3 sm:px-6 sm:py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Product
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="hidden sm:table-cell px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Category
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-4 py-3 sm:px-6 sm:py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Price
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="hidden lg:table-cell px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Description
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">
+                  <th className="px-4 py-3 sm:px-6 sm:py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">
                     Actions
                   </th>
                 </tr>
@@ -735,58 +732,49 @@ const ProductsManagement = () => {
                     className="hover:bg-gray-50/80 dark:hover:bg-white/5 transition-colors group"
                   >
                   {" "}
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {" "}
+                    <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        {" "}
                         <img
                           src={product.images?.[0] || product.image}
                           alt={product.name}
-                          className="w-12 h-12 rounded-xl object-cover shadow-sm group-hover:scale-105 transition-transform"
+                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-cover shadow-sm group-hover:scale-105 transition-transform flex-shrink-0"
                         />
-                        {" "}
-                        <span className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
-                          {product.name}
-                        </span>
-                        {" "}
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
+                            {product.name}
+                          </span>
+                          <span className="sm:hidden text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                            {product.category}
+                          </span>
+                        </div>
                       </div>
-                      {" "}
                     </td>
                     {" "}
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {" "}
+                    <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap">
                       <span
                         className={`px-2.5 py-1 rounded-full text-xs font-medium ${categoryColor[product.category] || "bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300"}`}
                       >
                         {product.category}
-                        {" "}
                       </span>
-                      {" "}
                     </td>
                     {" "}
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {" "}
+                    <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                       <span className="text-sm font-bold text-gray-900 dark:text-gray-100">
                         Rs. {Number(product.price).toFixed(2)}
                       </span>
                       <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
                         / {product.unit || 'kg'}
                       </span>
-                      {" "}
                     </td>
                     {" "}
-                    <td className="px-6 py-4 max-w-xs">
-                      {" "}
+                    <td className="hidden lg:table-cell px-6 py-4 max-w-xs">
                       <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                         {product.description}
                       </p>
-                      {" "}
                     </td>
                     {" "}
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                      {" "}
-                      <div className="flex items-center justify-end gap-2">
-                        {" "}
+                    <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-right">
+                      <div className="flex items-center justify-end gap-1.5 sm:gap-2">
                         <button
                           onClick={() =>
                             setModal({
@@ -797,11 +785,11 @@ const ProductsManagement = () => {
                               },
                             })
                           }
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 rounded-lg transition-colors"
+                          className="inline-flex items-center justify-center p-1.5 sm:px-3 sm:py-1.5 gap-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 rounded-lg transition-colors"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-3.5 w-3.5"
+                            className="h-4 w-4 sm:h-3.5 sm:w-3.5"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -813,15 +801,15 @@ const ProductsManagement = () => {
                               d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                             />
                           </svg>
-                          Edit
+                          <span className="hidden sm:inline">Edit</span>
                         </button>
                         <button
                           onClick={() => setModal({ type: "delete", product })}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 rounded-lg transition-colors"
+                          className="inline-flex items-center justify-center p-1.5 sm:px-3 sm:py-1.5 gap-1.5 text-xs font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 rounded-lg transition-colors"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-3.5 w-3.5"
+                            className="h-4 w-4 sm:h-3.5 sm:w-3.5"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -833,7 +821,7 @@ const ProductsManagement = () => {
                               d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                             />
                           </svg>
-                          Delete
+                          <span className="hidden sm:inline">Delete</span>
                         </button>
                       </div>
                     </td>

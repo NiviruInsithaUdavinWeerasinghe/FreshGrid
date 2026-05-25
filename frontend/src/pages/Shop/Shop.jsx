@@ -292,6 +292,52 @@ const Shop = () => {
     );
   };
 
+  const renderPromotionWidget = (extraClass = '') => (
+    <div className={`glass-panel p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-emerald-500/10 border border-primary/20 text-center relative overflow-hidden ${extraClass}`}>
+      <span className="text-3xl mb-2 block animate-bounce">🎁</span>
+      <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100">Promotion Alerts</h4>
+      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-4">Subscribe to get notified about our latest special offers!</p>
+      
+      {subMessage ? (
+        <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-2 p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl">
+          {subMessage}
+        </div>
+      ) : (
+        <>
+          {subError && (
+            <div className="text-xs font-bold text-red-600 dark:text-red-400 mb-2">
+              {subError}
+            </div>
+          )}
+          
+          {!user && (
+             <input 
+              type="email" 
+              placeholder="Your email" 
+              disabled
+              className="w-full px-3 py-2 text-xs bg-gray-100 dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 rounded-xl mb-2 text-center opacity-50 cursor-not-allowed"
+            />
+          )}
+          
+          <button 
+            onClick={handleSubscribe}
+            disabled={subLoading}
+            className="w-full py-2 bg-primary hover:bg-primary-light text-white text-xs font-bold rounded-xl transition-colors shadow-md shadow-primary/20 disabled:opacity-50 flex justify-center items-center h-8"
+          >
+            {subLoading ? (
+              <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : (
+              'Subscribe Now'
+            )}
+          </button>
+        </>
+      )}
+    </div>
+  );
+
   return (
     <div className="pb-8">
       {/* Header Banner */}
@@ -313,8 +359,8 @@ const Shop = () => {
         {/* Sidebar Filters */}
         <aside className="w-full lg:w-64 flex-shrink-0 space-y-6">
           
-          {/* Categories Filter Card */}
-          <div className="glass-panel p-6 rounded-2xl shadow-sm border border-gray-200/50 dark:border-white/5">
+          {/* Categories Filter Card (Desktop Only) */}
+          <div className="hidden lg:block glass-panel p-6 rounded-2xl shadow-sm border border-gray-200/50 dark:border-white/5">
             <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h12" />
@@ -343,49 +389,7 @@ const Shop = () => {
           </div>
 
           {/* Promotion Subscription Widget */}
-          <div className="glass-panel p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-emerald-500/10 border border-primary/20 text-center relative overflow-hidden">
-            <span className="text-3xl mb-2 block animate-bounce">🎁</span>
-            <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100">Promotion Alerts</h4>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-4">Subscribe to get notified about our latest special offers!</p>
-            
-            {subMessage ? (
-              <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-2 p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl">
-                {subMessage}
-              </div>
-            ) : (
-              <>
-                {subError && (
-                  <div className="text-xs font-bold text-red-600 dark:text-red-400 mb-2">
-                    {subError}
-                  </div>
-                )}
-                
-                {!user && (
-                   <input 
-                    type="email" 
-                    placeholder="Your email" 
-                    disabled
-                    className="w-full px-3 py-2 text-xs bg-gray-100 dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 rounded-xl mb-2 text-center opacity-50 cursor-not-allowed"
-                  />
-                )}
-                
-                <button 
-                  onClick={handleSubscribe}
-                  disabled={subLoading}
-                  className="w-full py-2 bg-primary hover:bg-primary-light text-white text-xs font-bold rounded-xl transition-colors shadow-md shadow-primary/20 disabled:opacity-50 flex justify-center items-center h-8"
-                >
-                  {subLoading ? (
-                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                  ) : (
-                    'Subscribe Now'
-                  )}
-                </button>
-              </>
-            )}
-          </div>
+          {renderPromotionWidget("hidden lg:block")}
         </aside>
 
         {/* Main Grid View */}
@@ -408,15 +412,28 @@ const Shop = () => {
               />
             </div>
 
-            {/* Sorting & Layout View Mode Toggles */}
-            <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-gray-400 uppercase whitespace-nowrap">Sort By:</span>
-                <div className="w-48">
+            {/* Mobile Category, Sorting & Layout View Mode Toggles */}
+            <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+              
+              {/* Mobile Categories Dropdown */}
+              <div className="w-full lg:hidden">
+                <CustomDropdown
+                  value={activeCategory}
+                  onChange={setActiveCategory}
+                  buttonClassName="px-3 py-1.5 text-xs bg-white/50 dark:bg-charcoal/50 w-full"
+                  options={dynamicCategories.map(cat => ({ value: cat, label: cat === 'All' ? 'All Categories' : cat }))}
+                />
+              </div>
+
+              {/* Sorting & Layout Wrapper */}
+              <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                <div className="flex items-center gap-2 flex-1 sm:flex-none">
+                <span className="text-[10px] sm:text-xs font-semibold text-gray-400 uppercase whitespace-nowrap hidden sm:inline">Sort By:</span>
+                <div className="w-full sm:w-48">
                   <CustomDropdown
                     value={sortBy}
                     onChange={setSortBy}
-                    buttonClassName="px-3 py-1.5 text-xs bg-white/50 dark:bg-charcoal/50"
+                    buttonClassName="px-3 py-1.5 text-xs bg-white/50 dark:bg-charcoal/50 w-full"
                     options={[
                       { value: 'alphabetical', label: 'Alphabetical (A-Z)' },
                       { value: 'price-low-high', label: 'Price: Low to High' },
@@ -427,7 +444,7 @@ const Shop = () => {
               </div>
 
               {/* View Layout buttons */}
-              <div className="flex items-center gap-1 border-l border-gray-200 dark:border-white/10 pl-4">
+              <div className="flex items-center gap-1 border-l border-gray-200 dark:border-white/10 pl-4 flex-shrink-0">
                 <button 
                   onClick={() => setViewMode('grid')}
                   className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-primary/10 text-primary dark:text-primary-light' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`}
@@ -449,6 +466,7 @@ const Shop = () => {
               </div>
             </div>
           </div>
+        </div>
 
           {/* Top Pagination Controls */}
           {renderPagination("pb-2")}
@@ -457,7 +475,7 @@ const Shop = () => {
           <div className={`overflow-hidden min-h-[600px] md:min-h-[800px] ${animClass}`}>
           {loading ? (
             /* Skeleton Loading Grid */
-            <div className={viewMode === 'grid' ? "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6" : "space-y-4"}>
+            <div className={viewMode === 'grid' ? "grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6" : "space-y-4"}>
               {Array.from({ length: 6 }).map((_, idx) => (
                 <div key={idx} className="glass-panel rounded-2xl overflow-hidden border border-gray-200/50 dark:border-white/5 animate-pulse flex flex-col h-72">
                   <div className="h-44 bg-gray-200 dark:bg-white/5 w-full" />
@@ -494,7 +512,7 @@ const Shop = () => {
                   exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.15 } }}
                   transition={{ duration: 0.25 }}
                   layout={!isPaginating} 
-                  className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
+                  className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6"
                 >
               <AnimatePresence mode="popLayout">
                 {paginatedProducts.map(product => (
@@ -532,29 +550,29 @@ const Shop = () => {
                     exit={isPaginating ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: -20 }}
                     transition={{ duration: 0.3 }}
                     onClick={() => setSelectedProduct(product)}
-                    className="glass-panel rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-primary/10 transition-shadow duration-200 group flex flex-col sm:flex-row h-auto sm:h-44 border border-gray-200/50 dark:border-white/5 cursor-pointer"
+                    className="glass-panel rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-primary/10 transition-shadow duration-200 group flex flex-row h-24 sm:h-44 border border-gray-200/50 dark:border-white/5 cursor-pointer"
                   >
-                    <div className="relative w-full sm:w-48 h-48 sm:h-auto overflow-hidden flex-shrink-0">
+                    <div className="relative w-24 sm:w-48 h-full overflow-hidden flex-shrink-0">
                     <img 
                       src={product.images?.[0] || product.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=600'} 
                       alt={product.name} 
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                     />
-                    <div className="absolute top-3 left-3 bg-white/95 dark:bg-[#1c1c1c]/95 px-3 py-1 rounded-full text-[10px] font-bold text-primary dark:text-primary-light border border-gray-200/50 dark:border-white/10 uppercase">
+                    <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-white/95 dark:bg-[#1c1c1c]/95 px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[8px] sm:text-[10px] font-bold text-primary dark:text-primary-light border border-gray-200/50 dark:border-white/10 uppercase">
                       {product.category}
                     </div>
                   </div>
-                  <div className="p-5 flex flex-col justify-between flex-grow">
+                  <div className="p-3 sm:p-5 flex flex-col justify-between flex-grow min-w-0">
                     <div>
-                      <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">{product.name}</h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
+                      <h3 className="text-sm sm:text-lg font-bold text-gray-900 dark:text-gray-100 mb-0.5 sm:mb-1 truncate">{product.name}</h3>
+                      <p className="hidden sm:block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
                         {product.description}
                       </p>
                     </div>
-                    <div className="flex items-center justify-between mt-4">
-                      <span className="text-lg font-extrabold text-gray-900 dark:text-white">
+                    <div className="flex items-center justify-between mt-2 sm:mt-4 gap-1">
+                      <span className="text-sm sm:text-lg font-extrabold text-gray-900 dark:text-white truncate">
                         Rs. {Number(product.price).toFixed(2)}
-                        <span className="text-xs font-normal text-gray-500 dark:text-gray-400 ml-1">/ {product.unit || 'kg'}</span>
+                        <span className="text-[10px] sm:text-xs font-normal text-gray-500 dark:text-gray-400 ml-1">/ {product.unit || 'kg'}</span>
                       </span>
                       {(() => {
                         const cartItem = getCartItem(product._id);
@@ -578,12 +596,12 @@ const Shop = () => {
                               if (!user) { navigate('/login'); return; }
                               addToCart(product._id);
                             }}
-                            className="bg-primary/10 hover:bg-primary text-primary hover:text-white dark:bg-primary/20 dark:hover:bg-primary dark:text-primary-light dark:hover:text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors duration-200"
+                            className="bg-primary/10 hover:bg-primary text-primary hover:text-white dark:bg-primary/20 dark:hover:bg-primary dark:text-primary-light dark:hover:text-white p-2 sm:px-4 sm:py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors duration-200"
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
                             </svg>
-                            Add to Cart
+                            <span className="hidden sm:inline">Add to Cart</span>
                           </button>
                         );
                       })()}
@@ -603,6 +621,9 @@ const Shop = () => {
         </main>
 
       </div>
+
+      {/* Promotion Subscription Widget (Mobile) */}
+      {renderPromotionWidget("block lg:hidden mt-8")}
       
       {/* Product Detail Modal */}
       {selectedProduct && (

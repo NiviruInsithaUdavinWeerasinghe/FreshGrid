@@ -61,15 +61,15 @@ const Navbar = () => {
         <div className="px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex-shrink-0 flex items-center gap-2 text-2xl font-bold text-primary dark:text-primary-light">
-            <span role="img" aria-label="sprout">🌱</span>
+          <Link to="/" className="flex-shrink-0 flex items-center gap-2 text-xl sm:text-2xl font-bold text-primary dark:text-primary-light">
+            <span role="img" aria-label="sprout" className="text-xl sm:text-2xl">🌱</span>
             FreshGrid
           </Link>
 
 
 
           {/* Right side icons */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -101,7 +101,7 @@ const Navbar = () => {
 
             {/* User Session Handler */}
             {user ? (
-              <div className="flex items-center gap-3 border-l border-gray-200 dark:border-white/10 pl-4 relative" ref={dropdownRef}>
+              <div className="flex items-center gap-2 sm:gap-3 border-l border-gray-200 dark:border-white/10 pl-2 sm:pl-4 relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="flex items-center gap-2 hover:opacity-80 transition-opacity focus:outline-none"

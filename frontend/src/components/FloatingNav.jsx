@@ -95,7 +95,7 @@ export default function FloatingNav() {
             className="bg-white/95 dark:bg-[#2a2a2a]/95 border border-gray-200/80 dark:border-white/10 shadow-lg shadow-black/5 hover:bg-white dark:hover:bg-[#333] hover:shadow-xl hover:-translate-y-0.5 hover:text-primary dark:hover:text-primary-light transition-all duration-300 px-4 py-2.5 flex items-center gap-1.5 rounded-full text-xs font-bold text-gray-700 dark:text-gray-200 group"
           >
             <ChevronLeft size={16} className="transition-transform group-hover:-translate-x-0.5" /> 
-            <span className="hidden sm:inline">Back to {prevPage}</span>
+            <span>Back to {prevPage}</span>
           </button>
         )}
 
@@ -105,7 +105,7 @@ export default function FloatingNav() {
             title={`Go forward to ${nextPage}`}
             className="bg-white/95 dark:bg-[#2a2a2a]/95 border border-gray-200/80 dark:border-white/10 shadow-lg shadow-black/5 hover:bg-white dark:hover:bg-[#333] hover:shadow-xl hover:-translate-y-0.5 hover:text-primary dark:hover:text-primary-light transition-all duration-300 px-4 py-2.5 flex items-center gap-1.5 rounded-full text-xs font-bold text-gray-700 dark:text-gray-200 group"
           >
-            <span className="hidden sm:inline">To {nextPage}</span>
+            <span>To {nextPage}</span>
             <ChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" />
           </button>
         )}
