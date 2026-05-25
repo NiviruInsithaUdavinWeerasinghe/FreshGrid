@@ -7,6 +7,11 @@ const Offer = require('../models/Offer');
 // Returns the authenticated user's cart with populated product details and applied offers
 const getCart = async (req, res) => {
   try {
+    // If an Admin accidentally triggers a cart fetch (e.g. visiting storefront), return an empty cart
+    if (req.user.role === 'admin') {
+      return res.json({ success: true, data: [] });
+    }
+
     const user = await User.findById(req.user._id)
       .populate({
         path: 'cart.productId',
