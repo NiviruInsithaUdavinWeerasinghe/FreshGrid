@@ -341,17 +341,18 @@ const sendContactEmail = async (name, email, message) => {
 </body></html>`;
 
   try {
+    const adminEmail = process.env.ADMIN_CONTACT_EMAIL || process.env.GMAIL_USER;
     await sgMail.send({
       from: FROM,
-      to: process.env.GMAIL_USER,
+      to: adminEmail,
       replyTo: email,
       subject: `New Contact Message from ${name}`,
       html,
     });
-    console.log('[EMAIL] Contact email sent from:', email);
+    console.log('[EMAIL] Contact email sent from:', email, '→ to:', adminEmail);
     return true;
   } catch (error) {
-    console.error('Error sending contact email:', error?.response?.body || error.message);
+    console.error('Error sending contact email:', JSON.stringify(error?.response?.body) || error.message);
     return false;
   }
 };
