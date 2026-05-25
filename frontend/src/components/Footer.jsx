@@ -13,8 +13,8 @@ const Footer = () => {
     e.preventDefault();
     setStatus({ loading: true, success: false, error: '' });
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-      const response = await fetch(`${apiUrl}/contact/send`, {
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const response = await fetch(`${baseUrl}/api/contact/send`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
