@@ -231,6 +231,18 @@ const AdminLogin = () => {
             Back to main site
           </Link>
         </div>
+
+        {siteKey && (
+          <>
+            <style>{`
+              .grecaptcha-badge { visibility: hidden !important; }
+            `}</style>
+            <div className="mt-8 text-center text-[10px] text-gray-400 dark:text-gray-500 max-w-xs mx-auto leading-relaxed border-t border-gray-200/50 dark:border-white/5 pt-4">
+              Protected by **reCAPTCHA v3** to prevent unauthorized access. <br />
+              Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary-light hover:underline font-semibold transition-colors">Privacy</a> & <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" className="text-primary-light hover:underline font-semibold transition-colors">Terms</a> apply.
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
