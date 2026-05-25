@@ -7,6 +7,15 @@ import PromoBanner from './PromoBanner';
 
 const Layout = () => {
   const location = useLocation();
+  const isAuthPage = ['/login', '/register', '/auth/callback'].includes(location.pathname);
+
+  if (isAuthPage) {
+    return (
+      <div key={location.key} className="page-enter">
+        <Outlet />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen relative">
