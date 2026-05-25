@@ -1,51 +1,18 @@
-const nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail');
 const dotenv = require('dotenv');
-const dns = require('dns');
-const { promisify } = require('util');
 
 dotenv.config();
 
-const resolve4 = promisify(dns.resolve4);
+// SendGrid sends over HTTPS (port 443) — works on Render free plan.
+// Nodemailer SMTP (ports 25/465/587) is firewall-blocked by Render free plan.
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-// Cache the resolved IPv4 address so we don't re-query DNS every send
-let _smtpHost = null;
+const FROM = { email: process.env.GMAIL_USER, name: 'FreshGrid' };
 
-/**
- * Returns a nodemailer transporter guaranteed to use an IPv4 address.
- * dns.resolve4() queries A-records ONLY — it cannot return an IPv6 address.
- * This bypasses Render's Linux resolver which prefers AAAA (IPv6) records,
- * causing ENETUNREACH since Render free plan blocks outbound IPv6.
- */
-const getTransporter = async () => {
-  if (!_smtpHost) {
-    try {
-      const addresses = await resolve4('smtp.gmail.com');
-      _smtpHost = addresses[0];
-      console.log(`[EMAIL] Resolved smtp.gmail.com → IPv4: ${_smtpHost}`);
-    } catch (err) {
-      // Fallback: if resolve4 itself fails, use hostname and hope for the best
-      console.warn('[EMAIL] dns.resolve4 failed, using hostname fallback:', err.message);
-      _smtpHost = 'smtp.gmail.com';
-    }
-  }
-
-  return nodemailer.createTransport({
-    host: _smtpHost,
-    port: 587,
-    secure: false, // STARTTLS
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD,
-    },
-    tls: {
-      rejectUnauthorized: false,
-      servername: 'smtp.gmail.com', // SNI: validate TLS cert against hostname, not raw IP
-    },
-  });
-};
+// ─── Welcome Email ─────────────────────────────────────────────────────────────
 
 const sendWelcomeEmail = async (email, name) => {
-  const htmlContent = `
+  const html = `
     <!DOCTYPE html>
     <html>
     <head>
@@ -59,8 +26,7 @@ const sendWelcomeEmail = async (email, name) => {
         .content { padding: 40px 30px; color: #374151; line-height: 1.6; font-size: 16px; }
         .content h2 { color: #111827; font-size: 22px; margin-top: 0; }
         .cta-container { text-align: center; margin: 30px 0; }
-        .cta-button { display: inline-block; background-color: #059669; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 9999px; font-weight: bold; font-size: 16px; transition: background-color 0.2s; }
-        .cta-button:hover { background-color: #047857; }
+        .cta-button { display: inline-block; background-color: #059669; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 9999px; font-weight: bold; font-size: 16px; }
         .features { background-color: #ecfdf5; border-radius: 12px; padding: 20px; margin: 30px 0; }
         .features p { margin: 10px 0; color: #065f46; font-weight: 500; }
         .footer { background-color: #f3f4f6; padding: 24px; text-align: center; color: #6b7280; font-size: 13px; border-top: 1px solid #e5e7eb; }
@@ -68,22 +34,17 @@ const sendWelcomeEmail = async (email, name) => {
     </head>
     <body>
       <div class="container">
-        <div class="header">
-          <h1>🌱 FreshGrid</h1>
-        </div>
+        <div class="header"><h1>🌱 FreshGrid</h1></div>
         <div class="content">
           <h2>Welcome to Fresh Club VIP, ${name}!</h2>
           <p>We're absolutely thrilled to have you join our community. As a VIP member, you'll be the first to know about our freshest harvests, exclusive discounts, and special bundles straight from local farms to your door.</p>
-          
           <div class="features">
             <p>✨ <strong>What to expect:</strong></p>
             <p>🚚 Exclusive Free Delivery Offers</p>
             <p>🍎 Early Access to Seasonal Produce</p>
             <p>🎁 Secret VIP-only Bundles</p>
           </div>
-
           <p>Thank you for supporting local farmers and sustainable agriculture. We can't wait to deliver the best nature has to offer right to your kitchen.</p>
-          
           <div class="cta-container">
             <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/shop" class="cta-button">Shop Fresh Now</a>
           </div>
@@ -98,20 +59,16 @@ const sendWelcomeEmail = async (email, name) => {
   `;
 
   try {
-    const transporter = await getTransporter();
-    const info = await transporter.sendMail({
-      from: '"FreshGrid" <' + process.env.GMAIL_USER + '>',
-      to: email,
-      subject: 'Welcome to Fresh Club VIP! 🎁',
-      html: htmlContent,
-    });
-    console.log('Welcome email sent: %s', info.messageId);
+    await sgMail.send({ from: FROM, to: email, subject: 'Welcome to Fresh Club VIP! 🎁', html });
+    console.log('[EMAIL] Welcome email sent to:', email);
     return true;
   } catch (error) {
-    console.error('Error sending welcome email:', error);
+    console.error('Error sending welcome email:', error?.response?.body || error.message);
     return false;
   }
 };
+
+// ─── Promotion Emails ───────────────────────────────────────────────────────────
 
 const sendPromotionEmails = async (emails, offerData) => {
   if (!emails || emails.length === 0) return;
@@ -148,17 +105,15 @@ const sendPromotionEmails = async (emails, offerData) => {
     detailsHtml = `
       <div style="background-color:#ecfdf5; border:1px solid #a7f3d0; border-radius:12px; padding:20px; margin:20px 0; text-align:left;">
         <h3 style="margin-top:0; color:#065f46;">
-          Bundle Package for Rs. ${offerData.config.bundlePackagePrice} 
+          Bundle Package for Rs. ${offerData.config.bundlePackagePrice}
           <span style="text-decoration:line-through; color:#9ca3af; font-size:16px; margin-left:8px; font-weight:normal;">(Value: Rs. ${originalTotal})</span>
         </h3>
-        <ul style="color:#065f46; margin:0; padding-left:20px;">
-          ${productsList}
-        </ul>
+        <ul style="color:#065f46; margin:0; padding-left:20px;">${productsList}</ul>
       </div>
     `;
   }
 
-  const htmlContent = `
+  const html = `
     <!DOCTYPE html>
     <html>
     <head>
@@ -173,29 +128,20 @@ const sendPromotionEmails = async (emails, offerData) => {
         .content { padding: 40px 30px; color: #374151; line-height: 1.6; font-size: 16px; text-align: center; }
         .badge { display: inline-block; background-color: #ecfdf5; color: #059669; padding: 6px 12px; border-radius: 9999px; font-size: 14px; font-weight: bold; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
         .title { color: #111827; font-size: 26px; font-weight: 800; margin: 0 0 16px 0; }
-        .desc { color: #4b5563; font-size: 16px; margin-bottom: 30px; }
-        .cta-container { text-align: center; margin: 30px 0; }
-        .cta-button { display: inline-block; background-color: #059669; color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 9999px; font-weight: bold; font-size: 16px; transition: background-color 0.2s; }
-        .cta-button:hover { background-color: #047857; }
+        .cta-button { display: inline-block; background-color: #059669; color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 9999px; font-weight: bold; font-size: 16px; }
         .footer { background-color: #f3f4f6; padding: 24px; text-align: center; color: #6b7280; font-size: 13px; border-top: 1px solid #e5e7eb; }
       </style>
     </head>
     <body>
       <div class="container">
-        <div class="header">
-          <h1>🌱 FreshGrid</h1>
-        </div>
+        <div class="header"><h1>🌱 FreshGrid</h1></div>
         ${offerData.config.image ? `<img src="${offerData.config.image}" alt="Special Offer" class="hero-image" />` : ''}
         <div class="content">
           <div class="badge">Special Offer</div>
           <h2 class="title">${offerData.title}</h2>
-          <p class="desc">${offerData.config.description || 'Log in to your FreshGrid account to check out our latest special offer!'}</p>
-          
+          <p>${offerData.config.description || 'Log in to your FreshGrid account to check out our latest special offer!'}</p>
           ${detailsHtml}
-
-          <div class="cta-container">
-            <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/shop" class="cta-button">Claim Offer Now</a>
-          </div>
+          <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/shop" class="cta-button">Claim Offer Now</a>
         </div>
         <div class="footer">
           <p>Valid until ${new Date(offerData.validTo).toLocaleDateString()}</p>
@@ -207,25 +153,25 @@ const sendPromotionEmails = async (emails, offerData) => {
   `;
 
   try {
-    const transporter = await getTransporter();
-    const info = await transporter.sendMail({
-      from: '"FreshGrid" <' + process.env.GMAIL_USER + '>',
-      to: process.env.GMAIL_USER, // Send to yourself
-      bcc: emails, // BCC to subscribers for privacy
+    await sgMail.send({
+      from: FROM,
+      to: process.env.GMAIL_USER,
+      bcc: emails,
       subject: '🔥 FreshGrid Special Offer: ' + offerData.title,
-      html: htmlContent,
+      html,
     });
-    console.log('Promotion email sent to %d subscribers', emails.length);
+    console.log('[EMAIL] Promotion email sent to %d subscribers', emails.length);
     return true;
   } catch (error) {
-    console.error('Error sending promotion emails:', error);
+    console.error('Error sending promotion emails:', error?.response?.body || error.message);
     return false;
   }
 };
 
+// ─── Verification Email ─────────────────────────────────────────────────────────
 
 const sendVerificationEmail = async (email, name, verificationUrl) => {
-  const htmlContent = `
+  const html = `
     <!DOCTYPE html>
     <html>
     <head>
@@ -242,9 +188,7 @@ const sendVerificationEmail = async (email, name, verificationUrl) => {
     </head>
     <body>
       <div class="container">
-        <div class="header">
-          <h1>🌱 FreshGrid</h1>
-        </div>
+        <div class="header"><h1>🌱 FreshGrid</h1></div>
         <div class="content">
           <h2>Hello ${name}!</h2>
           <p>Thanks for joining FreshGrid. We're excited to have you on board!</p>
@@ -256,17 +200,18 @@ const sendVerificationEmail = async (email, name, verificationUrl) => {
     </body>
     </html>
   `;
+
   try {
-    const transporter = await getTransporter();
-    await transporter.sendMail({
-      from: '"FreshGrid" <' + process.env.GMAIL_USER + '>',
+    await sgMail.send({
+      from: FROM,
       to: email,
       subject: 'Verify your FreshGrid Account 🌱',
-      html: htmlContent,
+      html,
     });
+    console.log('[EMAIL] Verification email sent to:', email);
     return true;
   } catch (error) {
-    console.error('Error sending verification email:', error);
+    console.error('Error sending verification email:', error?.response?.body || error.message);
     return false;
   }
 };
