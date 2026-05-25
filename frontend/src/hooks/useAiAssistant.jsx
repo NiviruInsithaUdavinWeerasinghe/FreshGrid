@@ -23,20 +23,47 @@ export const useAiAssistant = () => {
   const { cartItems, addToCart, removeItem, updateQuantity, setDeliveryType, paymentMethod, setPaymentMethod, deliveryType, fetchCart } = useCart();
   const { token, user } = useAuth();
 
-  const smoothNavigate = useCallback((path) => {
-    if (location.pathname === path) return;
+  const smoothNavigate = useCallback((path, scrollTo) => {
+    // Determine the base path vs any hash or query
+    const targetPathname = path.split('#')[0].split('?')[0];
+    const isSamePage = location.pathname === targetPathname || (location.pathname === '/' && targetPathname === '');
+
+    const doScroll = () => {
+      if (scrollTo === 'bottom') {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      } else if (scrollTo === 'top') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (scrollTo) {
+        const el = document.getElementById(scrollTo.replace('#', ''));
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+
+    if (isSamePage) {
+      if (path !== targetPathname) {
+        navigate(path);
+      }
+      doScroll();
+      return;
+    }
     
     // Fallback for browsers without View Transitions API
     if (!document.startViewTransition) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
       navigate(path);
+      setTimeout(doScroll, 150);
       return;
     }
 
     // Modern smooth transition with view transition API
     document.startViewTransition(() => {
-      window.scrollTo(0, 0);
       navigate(path);
+      setTimeout(doScroll, 150);
     });
   }, [location.pathname, navigate]);
 
@@ -45,7 +72,7 @@ export const useAiAssistant = () => {
     
     switch (type) {
       case 'navigate':
-        if (payload.path) smoothNavigate(payload.path);
+        if (payload.path) smoothNavigate(payload.path, payload.scrollTo);
         break;
       case 'manage_cart':
         if (payload.action === 'add') {

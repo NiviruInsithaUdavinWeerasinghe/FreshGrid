@@ -16,6 +16,10 @@ const chatTools = [
           type: 'string',
           description: 'The URL path to navigate to (e.g., /cart, /shop, /, /account)'
         },
+        scrollTo: {
+          type: 'string',
+          description: "Optional. 'top', 'bottom', or a specific section ID (e.g., 'footer') to scroll to after navigating."
+        },
         reply: {
           type: 'string',
           description: 'A conversational response telling the user what you are doing.'
