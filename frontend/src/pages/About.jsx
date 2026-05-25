@@ -57,7 +57,7 @@ export default function About() {
         >
           <div className="absolute -inset-4 bg-gradient-to-tr from-emerald-100 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-[2rem] transform rotate-3" />
           <img 
-            src="https://images.unsplash.com/photo-1592878904946-b3cd8ae243d0?auto=format&fit=crop&q=80&w=800" 
+            src="https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&q=80&w=800" 
             alt="Fresh harvest" 
             className="relative rounded-3xl shadow-xl w-full object-cover h-[350px] md:h-[450px] border-4 border-white dark:border-charcoal-light transform -rotate-2 hover:rotate-0 transition-transform duration-500"
           />

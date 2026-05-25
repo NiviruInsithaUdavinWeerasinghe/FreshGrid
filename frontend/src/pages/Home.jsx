@@ -83,7 +83,7 @@ const Home = () => {
         <div className="lg:w-1/2 relative">
           <div className="absolute inset-0 bg-primary/20 dark:bg-primary/10 rounded-full blur-3xl transform translate-x-10 translate-y-10"></div>
           <img 
-            src="https://images.unsplash.com/photo-1592878904946-b3cd8ae243d0?auto=format&fit=crop&q=80&w=800" 
+            src="https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&q=80&w=800" 
             alt="Fresh vegetables in a basket" 
             className="relative z-10 rounded-3xl shadow-2xl border border-white/20 dark:border-white/10 w-full object-cover h-[500px]"
           />
