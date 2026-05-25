@@ -12,10 +12,11 @@ const User = require('../models/User');
 const Admin = require('../models/Admin');
 const emailService = require('../services/emailService');
 
-// Relying Party configs for Passkeys on localhost
+// Relying Party configs — derived from FRONTEND_URL so it works on any domain
 const rpName = 'FreshGrid';
-const rpID = 'localhost';
-const origin = process.env.FRONTEND_URL || 'http://localhost:5173';
+const frontendUrl = new URL(process.env.FRONTEND_URL || 'http://localhost:5173');
+const rpID = process.env.PASSKEY_RP_ID || frontendUrl.hostname;   // e.g. 'freshgrid.vercel.app' or 'localhost'
+const origin = process.env.FRONTEND_URL || 'http://localhost:5173'; // full URL for origin check
 
 // Helpers
 const generateToken = (id, role = 'customer') => {
