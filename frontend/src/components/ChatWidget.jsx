@@ -33,6 +33,12 @@ const ChatWidget = () => {
     }
   }, [messages, isTyping, isOpen, showHistory]);
 
+  useEffect(() => {
+    const handleCloseChat = () => setIsOpen(false);
+    window.addEventListener('ai_close_chat', handleCloseChat);
+    return () => window.removeEventListener('ai_close_chat', handleCloseChat);
+  }, []);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!inputText.trim()) return;

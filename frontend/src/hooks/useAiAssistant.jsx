@@ -169,6 +169,9 @@ export const useAiAssistant = () => {
           }
         }
         break;
+      case 'close_chat':
+        window.dispatchEvent(new Event('ai_close_chat'));
+        break;
       case 'navigate_shop_pagination':
         if (location.pathname !== '/shop') {
           smoothNavigate('/shop');

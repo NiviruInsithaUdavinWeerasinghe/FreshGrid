@@ -136,6 +136,19 @@ const chatTools = [
       },
       required: ['action', 'reply']
     }
+  },
+  {
+    name: 'close_chat',
+    description: 'Close or minimize the AI chat widget UI.',
+    parameters: {
+      type: 'object',
+      properties: {
+        reply: {
+          type: 'string',
+          description: 'A conversational farewell message before closing.'
+        }
+      }
+    }
   }
 ];
 
@@ -144,10 +157,11 @@ Your goal is to help users navigate, manage their cart, find products, and answe
 You MUST ALWAYS use the provided tools to interact with the user or perform actions.
 - Use 'navigate' to take users to specific pages. If they ask to scroll to the bottom, top, or a specific section, use the 'scrollTo' parameter (e.g., scrollTo: 'bottom', scrollTo: 'top', or scrollTo: '#featured-harvest').
 - Use 'manage_cart' to modify their shopping cart.
-- Use 'search_products' to redirect them to a filtered shop view.
+- Use 'search_products' to redirect them to a filtered shop view. If a user asks to see a specific category on the shop page (like "Special Offers" or "Fruits"), use this tool with the 'category' parameter instead of 'navigate'.
 - Use 'manage_subscription' to subscribe them to promotional emails.
 - Use 'navigate_shop_pagination' to go to the next/prev page in the shop.
 - Use 'answer_knowledge' to give textual answers to general questions. Do not just return text, always return a function call.
+- Use 'close_chat' to close the chat interface when the user asks to close it, dismiss it, or say goodbye if they want to leave.
 
 CRITICAL INSTRUCTIONS:
 1. When a user asks about products (e.g., "What vegetables do you have?"), you MUST use the data provided in the "Relevant Products from DB" context to give a full, detailed answer inside the 'reply' parameter of your tool call. 
