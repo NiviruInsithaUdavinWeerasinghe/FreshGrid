@@ -229,6 +229,18 @@ import ReactDOM from 'react-dom';
 
   const sortedProducts = [...products].sort((a, b) => a.name.localeCompare(b.name));
 
+  const originalBundleValue = form.offerType === 'BUNDLE_PACKAGE' 
+    ? (form.config.bundleProducts || []).reduce((acc, bp) => {
+        if (!bp.productId || !bp.quantity) return acc;
+        const prod = products.find(p => p._id === bp.productId);
+        if (!prod) return acc;
+        return acc + (Number(prod.price) * Number(bp.quantity));
+      }, 0)
+    : 0;
+
+  const flatPrice = Number(form.config.bundlePackagePrice) || 0;
+  const bundleSavings = originalBundleValue > flatPrice && flatPrice > 0 ? originalBundleValue - flatPrice : 0;
+
   return (
     <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto transition-opacity duration-150 ${closing ? "opacity-0" : "opacity-100"}`}>
       <div className="absolute inset-0 bg-black/70" onClick={handleClose} />
@@ -380,8 +392,22 @@ import ReactDOM from 'react-dom';
               {form.offerType === 'BUNDLE_PACKAGE' && (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">Flat Bundle Price (LKR) *</label>
-                    <input required type="number" value={form.config.bundlePackagePrice || ''} onChange={e => handleConfigChange('bundlePackagePrice', e.target.value)} className="w-full px-4 py-3 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-primary outline-none" placeholder="e.g. 6000" />
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5 flex items-center justify-between">
+                      <span>Flat Bundle Price (LKR) *</span>
+                      {originalBundleValue > 0 && (
+                        <span className="text-[10px] bg-gray-100 dark:bg-white/10 px-2 py-0.5 rounded text-gray-600 dark:text-gray-300">
+                          Original Value: <span className="font-bold line-through">Rs. {originalBundleValue.toFixed(2)}</span>
+                        </span>
+                      )}
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <input required type="number" value={form.config.bundlePackagePrice || ''} onChange={e => handleConfigChange('bundlePackagePrice', e.target.value)} className="w-full px-4 py-3 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-primary outline-none" placeholder="e.g. 6000" />
+                      {bundleSavings > 0 && (
+                        <div className="flex-shrink-0 px-3 py-2 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-xl text-xs font-bold whitespace-nowrap shadow-sm">
+                          Save Rs. {bundleSavings.toFixed(2)}
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <div>
                     <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">Bundle Products *</label>
