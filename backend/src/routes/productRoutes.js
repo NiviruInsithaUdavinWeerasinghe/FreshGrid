@@ -9,13 +9,29 @@ const { upload } = require('../config/cloudinary');                           //
 
 const { protect, adminOnly } = require('../middleware/auth');                  // Import authorization middlewares
 
+// Custom wrapper to catch multer/cloudinary errors gracefully
+const handleUpload = (req, res, next) => {
+  const uploadSingle = upload.single('image');
+  uploadSingle(req, res, function (err) {
+    if (err) {
+      console.error('Upload Error:', err);
+      // Check if it's a format error from Cloudinary
+      if (err.message && (err.message.includes('format') || err.message.includes('not allowed'))) {
+        return res.status(400).json({ success: false, message: 'Invalid image format. Please upload JPG, PNG, or WEBP only.' });
+      }
+      return res.status(400).json({ success: false, message: err.message || 'Image upload failed. Please check the file and try again.' });
+    }
+    next();
+  });
+};
+
 // ─── POST /api/products ────────────────────────────────────────────────────────
 // Creates a new product. The request must be sent as multipart/form-data
 // so that both the text fields and the image file arrive in a single request.
 // 'upload.single('image')' processes exactly one file from the 'image' form field
 // and attaches the resulting Cloudinary URL to req.file before the controller runs.
 // Note: 'image' must match the field name used in the React frontend's FormData object.
-router.post('/', protect, adminOnly, upload.single('image'), productController.addProduct);
+router.post('/', protect, adminOnly, handleUpload, productController.addProduct);
 
 // ─── POST /api/products/estimate-metrics ───────────────────────────────────────
 router.post('/estimate-metrics', protect, adminOnly, productController.estimateMetrics);
@@ -29,7 +45,7 @@ router.get('/', productController.getProducts);
 // Updates an existing product identified by its MongoDB ObjectId (:id).
 // Optionally accepts a new image file; if none is provided, the existing image is kept.
 // 'upload.single('image')' is included so partial updates with a new image work seamlessly.
-router.put('/:id', protect, adminOnly, upload.single('image'), productController.updateProduct);
+router.put('/:id', protect, adminOnly, handleUpload, productController.updateProduct);
 
 // ─── DELETE /api/products/:id ──────────────────────────────────────────────────
 // Permanently deletes a product by its MongoDB ObjectId (:id).
