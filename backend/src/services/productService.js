@@ -25,7 +25,6 @@ const createProduct = async (productData) => {
  */
 const getAllProducts = async () => {
     return await Product.find()                     // Fetch every product document from the collection
-        .populate('category', 'name')               // Replace the category ObjectId with just the category's name field
         .sort({ createdAt: -1 });                   // Sort descending by creation date (newest first)
 };
 
