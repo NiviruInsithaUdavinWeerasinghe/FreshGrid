@@ -17,7 +17,7 @@ const Navbar = () => {
       e.preventDefault();
       logoClicksRef.current = 0;
       if (logoTimerRef.current) clearTimeout(logoTimerRef.current);
-      navigate('/admin');
+      window.open('/admin', '_blank');
       return;
     }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import ProductCard from '../components/ProductCard';
@@ -6,6 +6,16 @@ import ProductCard from '../components/ProductCard';
 const Home = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeStep, setActiveStep] = useState(0);
+  const stepsScrollRef = useRef(null);
+
+  const handleStepsScroll = () => {
+    if (stepsScrollRef.current) {
+      const { scrollLeft, clientWidth } = stepsScrollRef.current;
+      const activeIndex = Math.round(scrollLeft / clientWidth);
+      setActiveStep(activeIndex);
+    }
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -103,7 +113,7 @@ const Home = () => {
           </Link>
         </div>
         
-        <div className="flex overflow-x-auto sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 pb-4 snap-x snap-mandatory" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        <div className="flex overflow-x-auto sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 pb-4 snap-x snap-mandatory w-full max-w-full" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {loading ? (
             Array.from({ length: 3 }).map((_, idx) => (
               <div key={idx} className="min-w-[75vw] sm:min-w-0 snap-center shrink-0 glass-panel rounded-2xl overflow-hidden border border-gray-200/50 dark:border-white/5 animate-pulse flex flex-col h-[400px]">
@@ -137,13 +147,18 @@ const Home = () => {
       </section>
 
       {/* How it Works */}
-      <section id="how-it-works" className="glass-panel rounded-3xl p-8 md:p-16">
+      <section id="how-it-works" className="glass-panel rounded-3xl px-4 py-8 sm:px-6 sm:py-10 md:p-16">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">How FreshGrid Works</h2>
           <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">From the soil to your kitchen in three simple steps.</p>
         </div>
         
-        <div className="flex overflow-x-auto md:grid md:grid-cols-3 gap-6 md:gap-12 pb-4 snap-x snap-mandatory text-center" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        <div 
+          ref={stepsScrollRef}
+          onScroll={handleStepsScroll}
+          className="flex overflow-x-auto md:grid md:grid-cols-3 gap-6 md:gap-12 pb-4 snap-x snap-mandatory text-center w-full max-w-full" 
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
           <div className="w-full md:w-auto space-y-4 snap-center shrink-0">
             <div className="w-16 h-16 mx-auto bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light rounded-2xl flex items-center justify-center text-2xl font-bold">1</div>
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">Browse & Order</h3>
@@ -159,6 +174,29 @@ const Home = () => {
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">Doorstep Delivery</h3>
             <p className="text-gray-600 dark:text-gray-400">Receive your fresh produce at your doorstep the very next morning.</p>
           </div>
+        </div>
+
+        {/* Mobile Pagination Dots */}
+        <div className="flex md:hidden justify-center items-center gap-2.5 mt-6">
+          {[0, 1, 2].map((idx) => (
+            <button
+              key={idx}
+              onClick={() => {
+                if (stepsScrollRef.current) {
+                  stepsScrollRef.current.scrollTo({
+                    left: idx * stepsScrollRef.current.clientWidth,
+                    behavior: 'smooth'
+                  });
+                }
+              }}
+              className={`h-2.5 rounded-full transition-all duration-300 ${
+                activeStep === idx 
+                  ? 'w-6 bg-primary dark:bg-primary-light' 
+                  : 'w-2.5 bg-gray-300 dark:bg-gray-700'
+              }`}
+              aria-label={`Go to step ${idx + 1}`}
+            />
+          ))}
         </div>
       </section>
     </div>
