@@ -1,3 +1,6 @@
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first');
+
 const express = require('express'); // Import the express framework for building the server
 const cors = require('cors'); // Import cors middleware to allow cross-origin requests
 const dotenv = require('dotenv'); // Import dotenv to load environment variables from a .env file
