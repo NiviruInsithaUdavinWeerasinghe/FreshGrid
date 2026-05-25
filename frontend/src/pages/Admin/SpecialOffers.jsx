@@ -412,27 +412,38 @@ import ReactDOM from 'react-dom';
                   <div>
                     <label className="block text-xs font-bold uppercase text-gray-500 mb-1.5">Bundle Products *</label>
                     <div className="space-y-3 mb-3">
-                      {(form.config.bundleProducts || []).map((bp, i) => (
-                        <div key={i} className="flex items-center gap-2">
-                          <div className="flex-1">
-                            <CustomDropdown
-                              value={bp.productId}
-                              onChange={val => handleUpdateBundleItem(i, 'productId', val)}
-                              options={[
-                                { value: "", label: "Select Product" },
-                                ...sortedProducts
-                                  .filter(p => p._id === bp.productId || !(form.config.bundleProducts || []).some((otherBp, index) => index !== i && otherBp.productId === p._id))
-                                  .map(p => ({ value: p._id, label: p.name }))
-                              ]}
-                              error={!bp.productId}
-                            />
+                      {(form.config.bundleProducts || []).map((bp, i) => {
+                        const selectedProd = products.find(p => p._id === bp.productId);
+                        const itemTotal = selectedProd ? Number(selectedProd.price) * Number(bp.quantity || 1) : 0;
+                        return (
+                          <div key={i} className="flex flex-col gap-1.5">
+                            <div className="flex items-center gap-2">
+                              <div className="flex-1">
+                                <CustomDropdown
+                                  value={bp.productId}
+                                  onChange={val => handleUpdateBundleItem(i, 'productId', val)}
+                                  options={[
+                                    { value: "", label: "Select Product" },
+                                    ...sortedProducts
+                                      .filter(p => p._id === bp.productId || !(form.config.bundleProducts || []).some((otherBp, index) => index !== i && otherBp.productId === p._id))
+                                      .map(p => ({ value: p._id, label: p.name }))
+                                  ]}
+                                  error={!bp.productId}
+                                />
+                              </div>
+                              <input required type="number" min="1" value={bp.quantity} onChange={e => handleUpdateBundleItem(i, 'quantity', e.target.value)} className="w-24 px-4 py-2 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-primary outline-none" placeholder="Qty" />
+                              <button type="button" onClick={() => handleRemoveBundleItem(i)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                              </button>
+                            </div>
+                            {selectedProd && (
+                              <div className="text-[10px] text-gray-500 dark:text-gray-400 text-right pr-12">
+                                {bp.quantity}x @ Rs. {Number(selectedProd.price).toFixed(2)} = <span className="font-bold">Rs. {itemTotal.toFixed(2)}</span>
+                              </div>
+                            )}
                           </div>
-                          <input required type="number" min="1" value={bp.quantity} onChange={e => handleUpdateBundleItem(i, 'quantity', e.target.value)} className="w-24 px-4 py-2 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-primary outline-none" placeholder="Qty" />
-                          <button type="button" onClick={() => handleRemoveBundleItem(i)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                          </button>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                     <button type="button" onClick={handleAddBundleItem} className="px-4 py-2 bg-primary/10 text-primary hover:bg-primary/20 font-semibold text-sm rounded-xl transition-colors">
                       + Add Product to Package
