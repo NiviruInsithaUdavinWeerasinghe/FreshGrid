@@ -27,7 +27,6 @@ FreshGrid is a modern, full-stack online shopping cart application designed to p
 ### 1. Clone the Repository
 ```bash
 git clone https://github.com/NiviruInsithaUdavinWeerasinghe/FreshGrid.git
-cd FreshGrid
 ```
 
 ### 2. Backend Setup
