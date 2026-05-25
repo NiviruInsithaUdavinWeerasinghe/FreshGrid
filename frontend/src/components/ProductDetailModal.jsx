@@ -64,6 +64,12 @@ const ProductDetailModal = ({ product, onClose }) => {
   const isBundle = product.isOffer && product.offerData?.offerType === 'BUNDLE_PACKAGE';
   const bundleItems = isBundle ? product.offerData.config.bundleProducts : [];
 
+  const originalPrice = isBundle
+    ? bundleItems.reduce((acc, item) => acc + (item.quantity * (item.productId?.price || 0)), 0)
+    : product.originalPrice || 0; // fallback if single product has originalPrice passed down
+    
+  const savings = originalPrice > product.price ? originalPrice - product.price : 0;
+
   const modalContent = (
     <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-hidden ${closing ? "animate-fade-out" : "animate-fade-in"}`}>
       <div className="absolute inset-0 bg-black/80" onClick={handleClose} />
@@ -128,14 +134,29 @@ const ProductDetailModal = ({ product, onClose }) => {
             )}
 
             {/* Price Block */}
-            <div className="flex items-end gap-2 mb-6 pb-6 border-b border-gray-200 dark:border-white/5">
+            <div className="flex items-end gap-2 mb-6 pb-6 border-b border-gray-200 dark:border-white/5 flex-wrap">
               <span className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tighter">
                 <span className="text-base text-gray-400 mr-1 font-bold">Rs.</span>
                 {Number(product.price).toFixed(2)}
               </span>
-              <span className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 bg-gray-100 dark:bg-white/5 px-2 py-0.5 rounded-md">
+              
+              {savings > 0 && (
+                <span className="text-base md:text-lg text-gray-400 dark:text-gray-500 line-through font-bold mb-0.5 ml-1">
+                  Rs. {Number(originalPrice).toFixed(2)}
+                </span>
+              )}
+              
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 bg-gray-100 dark:bg-white/5 px-2 py-0.5 rounded-md ml-1">
                 / {product.unit || 'kg'}
               </span>
+
+              {savings > 0 && (
+                <div className="w-full mt-2">
+                  <span className="inline-block bg-primary/10 text-primary dark:text-primary-light font-bold text-xs px-2.5 py-1 rounded-md border border-primary/20">
+                    Save Rs. {Number(savings).toFixed(2)}!
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Bundle Contents */}
