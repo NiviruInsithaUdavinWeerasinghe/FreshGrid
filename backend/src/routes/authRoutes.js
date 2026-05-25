@@ -69,7 +69,7 @@ router.post('/passkey/login/finish', loginPasskeyFinish);
 router.post('/passkey/unlink', protect, unlinkPasskey);
 
 // ─── Google OAuth ──────────────────────────────────────────────────────────────
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], session: false, state: false }));
 
 router.get(
   '/google/callback',
@@ -90,7 +90,7 @@ router.get(
 );
 
 // ─── Facebook OAuth ────────────────────────────────────────────────────────────
-router.get('/facebook', passport.authenticate('facebook', { scope: ['public_profile', 'email'], session: false }));
+router.get('/facebook', passport.authenticate('facebook', { scope: ['public_profile', 'email'], session: false, state: false }));
 
 router.get(
   '/facebook/callback',

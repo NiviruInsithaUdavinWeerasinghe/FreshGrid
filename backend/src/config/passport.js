@@ -41,6 +41,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         callbackURL: process.env.GOOGLE_CALLBACK_URL,
         proxy: true,
+        state: false, // Disable session-based state — MemoryStore is per-instance on Render
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
@@ -91,6 +92,7 @@ if (process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET) {
         callbackURL: process.env.FACEBOOK_CALLBACK_URL,
         profileFields: ['id', 'displayName', 'emails'],
         proxy: true,
+        state: false, // Disable session-based state — MemoryStore is per-instance on Render
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
