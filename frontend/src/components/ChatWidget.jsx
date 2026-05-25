@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAiAssistant } from '../hooks/useAiAssistant';
 import { useAuth } from '../context/AuthContext';
 import ChatMessage, { TypingIndicator } from './ChatMessage';
+import { useAdminAuth } from '../context/AdminAuthContext';
 
 const ChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,6 +12,7 @@ const ChatWidget = () => {
   const [inputText, setInputText] = useState('');
   const messagesEndRef = useRef(null);
   const { user } = useAuth();
+  const { isAdminLoggedIn } = useAdminAuth();
   
   const { 
     messages, 
@@ -60,6 +62,8 @@ const ChatWidget = () => {
     loadSession(sessionId);
     setShowHistory(false);
   };
+
+  if (isAdminLoggedIn) return null;
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">

@@ -572,7 +572,7 @@ const ProductsManagement = () => {
       await fetchProducts(); // wait for list to refresh before closing
       setModal(null);        // close modal only after everything is done
     } catch (error) {
-      showToast("Operation failed", "error");
+      showToast(error.response?.data?.message || "Operation failed", "error");
       throw error; // re-throw so the modal's saving state resets
     }
   };
@@ -884,7 +884,7 @@ const ProductsManagement = () => {
       {/* Toast Notification */}
       {toast && (
         <div
-          className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-white text-sm font-medium transition-all animate-slide-up ${
+          className={`fixed bottom-6 right-6 z-[9999] flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-white text-sm font-medium transition-all animate-slide-up ${
             toast.type === "error" ? "bg-red-500" : "bg-primary"
           }`}
         >
