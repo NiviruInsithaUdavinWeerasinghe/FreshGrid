@@ -91,7 +91,15 @@ import ReactDOM from 'react-dom';
         ? {
             ...offer,
             validFrom: offer.validFrom ? new Date(offer.validFrom).toISOString().slice(0, 16) : '',
-            validTo: offer.validTo ? new Date(offer.validTo).toISOString().slice(0, 16) : ''
+            validTo: offer.validTo ? new Date(offer.validTo).toISOString().slice(0, 16) : '',
+            config: {
+              ...offer.config,
+              targetProductId: offer.config.targetProductId?._id || offer.config.targetProductId || '',
+              bundleProducts: (offer.config.bundleProducts || []).map(bp => ({
+                ...bp,
+                productId: bp.productId?._id || bp.productId || ''
+              }))
+            }
           }
         : emptyOffer
     );
