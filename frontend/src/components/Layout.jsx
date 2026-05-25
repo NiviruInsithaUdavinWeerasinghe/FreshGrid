@@ -24,7 +24,7 @@ const Layout = () => {
             height: auto !important;
             background: transparent !important;
             padding-top: 100px !important; /* Clear floated Navbar space */
-            padding-bottom: 40px !important; /* Spacing so bottom is never cut off */
+            padding-bottom: 100px !important; /* Balanced bottom spacing */
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
