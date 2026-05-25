@@ -7,6 +7,7 @@ const {
   generateAuthenticationOptions,
   verifyAuthenticationResponse,
 } = require('@simplewebauthn/server');
+const axios = require('axios');
 
 const User = require('../models/User');
 const Admin = require('../models/Admin');
@@ -207,7 +208,7 @@ const getLockoutDuration = (attempts) => {
 
 const adminLogin = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, recaptchaToken } = req.body;
 
     if (!username || !password) {
       return res.status(400).json({ success: false, message: 'Username and password are required.' });
@@ -229,6 +230,30 @@ const adminLogin = async (req, res) => {
         message: 'Too many failed login attempts.',
         retryAfter, // seconds remaining
       });
+    }
+
+    // Verify Google reCAPTCHA v3 if configured
+    const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY;
+    if (recaptchaSecret) {
+      if (!recaptchaToken) {
+        return res.status(400).json({ success: false, message: 'reCAPTCHA token is missing.' });
+      }
+
+      try {
+        const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaSecret}&response=${recaptchaToken}`;
+        const recaptchaRes = await axios.post(verifyUrl);
+
+        if (!recaptchaRes.data.success || recaptchaRes.data.score < 0.5) {
+          console.warn(`[SECURITY] reCAPTCHA verification failed for IP ${ip}. Score: ${recaptchaRes.data.score || 'none'}`);
+          return res.status(403).json({
+            success: false,
+            message: 'reCAPTCHA verification failed. Bot activity suspected.',
+          });
+        }
+      } catch (err) {
+        console.error('reCAPTCHA server error:', err.message);
+        // Fallback: do not block login if Google reCAPTCHA servers are down
+      }
     }
 
     const admin = await Admin.findOne({ username: username.trim() });

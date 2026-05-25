@@ -13,6 +13,8 @@ const AdminLogin = () => {
   const [lockoutSeconds, setLockoutSeconds] = useState(0);
   const lockoutInterval = useRef(null);
 
+  const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+
   // Countdown timer for lockout
   useEffect(() => {
     if (lockoutSeconds > 0) {
@@ -29,6 +31,22 @@ const AdminLogin = () => {
     }
     return () => clearInterval(lockoutInterval.current);
   }, [lockoutSeconds]);
+
+  // Load Google reCAPTCHA v3 script dynamically if siteKey is provided
+  useEffect(() => {
+    if (siteKey) {
+      const script = document.createElement('script');
+      script.src = `https://www.google.com/recaptcha/api.js?render=${siteKey}`;
+      script.async = true;
+      document.body.appendChild(script);
+
+      return () => {
+        document.body.removeChild(script);
+        const badge = document.querySelector('.grecaptcha-badge');
+        if (badge) badge.remove();
+      };
+    }
+  }, [siteKey]);
 
   const formatCountdown = (secs) => {
     if (secs >= 86400) return `${Math.ceil(secs / 86400)} day(s)`;
@@ -50,13 +68,25 @@ const AdminLogin = () => {
 
     setTimeout(async () => {
       try {
-        const result = await login(username, password);
+        let recaptchaToken = null;
+        if (siteKey && window.grecaptcha) {
+          try {
+            await new Promise((resolve) => window.grecaptcha.ready(resolve));
+            recaptchaToken = await window.grecaptcha.execute(siteKey, { action: 'admin_login' });
+          } catch (recaptchaErr) {
+            console.error('Failed to execute reCAPTCHA:', recaptchaErr);
+          }
+        }
+
+        const result = await login(username, password, recaptchaToken);
         if (result.success) {
           navigate('/admin/dashboard');
         } else if (result.status === 429) {
           const secs = result.retryAfter || 120;
           setLockoutSeconds(secs);
           setError(`Too many failed attempts. Try again in ${formatCountdown(secs)}.`);
+        } else if (result.status === 403) {
+          setError('Bot activity suspected. reCAPTCHA verification failed.');
         } else {
           setError('Invalid username or password. Please try again.');
         }

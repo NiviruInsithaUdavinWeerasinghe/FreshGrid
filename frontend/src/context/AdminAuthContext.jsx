@@ -31,11 +31,12 @@ export const AdminAuthProvider = ({ children }) => {
     () => !!localStorage.getItem('adminToken')
   );
 
-  const login = async (username, password) => {
+  const login = async (username, password, recaptchaToken) => {
     try {
       const res = await axios.post((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/auth/admin/login', {
         username,
         password,
+        recaptchaToken,
       });
 
       if (res.data.success) {
