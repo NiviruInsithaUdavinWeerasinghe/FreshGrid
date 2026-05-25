@@ -239,7 +239,7 @@ const sendVerificationEmail = async (email, name, verificationUrl) => {
 <style>${baseStyles}
 .steps { counter-reset: step; margin: 24px 0; }
 .step  { display: flex; align-items: flex-start; margin-bottom: 14px; }
-.step-num { width: 28px; height: 28px; min-width: 28px; background: ${green}; color: #fff; border-radius: 50%; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-right: 14px; }
+.step-num { width: 28px; height: 28px; min-width: 28px; background: ${green}; color: #fff; border-radius: 50%; font-size: 13px; font-weight: 700; text-align: center; line-height: 28px; display: inline-block; margin-right: 14px; vertical-align: middle; }
 .step-text { font-size: 14px; color: ${textMid}; line-height: 1.5; padding-top: 4px; }
 </style></head>
 <body>
