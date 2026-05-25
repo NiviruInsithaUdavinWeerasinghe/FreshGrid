@@ -9,7 +9,7 @@ export default function About() {
       <div className="relative rounded-3xl overflow-hidden mb-16 shadow-2xl">
         <div className="absolute inset-0 bg-gradient-to-r from-emerald-900/90 to-teal-800/80 z-10" />
         <img 
-          src="https://images.unsplash.com/photo-1595856328906-8c9df1fb4e93?auto=format&fit=crop&q=80&w=1200" 
+          src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&q=80&w=1200" 
           alt="Farmers at sunset"
           className="w-full h-[300px] md:h-[400px] object-cover"
         />
