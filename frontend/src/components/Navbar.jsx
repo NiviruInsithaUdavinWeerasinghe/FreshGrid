@@ -1,11 +1,31 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const { cartCount } = useCart();
+  const navigate = useNavigate();
+  const logoClicksRef = useRef(0);
+  const logoTimerRef = useRef(null);
+
+  const handleLogoClick = (e) => {
+    logoClicksRef.current += 1;
+    
+    if (logoClicksRef.current === 5) {
+      e.preventDefault();
+      logoClicksRef.current = 0;
+      if (logoTimerRef.current) clearTimeout(logoTimerRef.current);
+      navigate('/admin');
+      return;
+    }
+
+    if (logoTimerRef.current) clearTimeout(logoTimerRef.current);
+    logoTimerRef.current = setTimeout(() => {
+      logoClicksRef.current = 0;
+    }, 2000);
+  };
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
@@ -61,7 +81,7 @@ const Navbar = () => {
         <div className="px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex-shrink-0 flex items-center gap-2 text-xl sm:text-2xl font-bold text-primary dark:text-primary-light">
+          <Link to="/" onClick={handleLogoClick} className="flex-shrink-0 flex items-center gap-2 text-xl sm:text-2xl font-bold text-primary dark:text-primary-light">
             <span role="img" aria-label="sprout" className="text-xl sm:text-2xl">🌱</span>
             FreshGrid
           </Link>
