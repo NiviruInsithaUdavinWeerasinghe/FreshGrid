@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Home as HomeIcon } from 'lucide-react';
 
 const getPageName = (path) => {
   if (path === '/') return 'Home';
+  if (path.startsWith('/about')) return 'Our Story';
   if (path.startsWith('/shop')) return 'Shop';
   if (path.startsWith('/cart')) return 'Cart';
   if (path.startsWith('/account')) return 'Profile';

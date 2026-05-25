@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import Shop from './pages/Shop/Shop';
+import About from './pages/About';
 import Cart from './pages/Cart/Cart';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
@@ -29,6 +30,7 @@ function App() {
               <Route element={<Layout />}>
                 <Route path="/" element={<Home />} />
                 <Route path="/shop" element={<Shop />} />
+                <Route path="/about" element={<About />} />
                 
                 {/* Protected Storefront Routes */}
                 <Route element={<ProtectedRoute />}>
