@@ -1,4 +1,10 @@
-# FreshGrid
+<div align="center">
+  <a href="https://freshgrid-rosy.vercel.app/">
+    <img src="./frontend/public/og-icon.png" width="120" alt="FreshGrid Icon">
+  </a>
+  
+  # [🛒 FreshGrid](https://freshgrid-rosy.vercel.app/)
+</div>
 
 FreshGrid is a modern, full-stack online shopping cart application designed to provide a seamless e-commerce experience. It features secure authentication, dynamic product categorization, a responsive UI, and an administrative dashboard for product and order management.
 
