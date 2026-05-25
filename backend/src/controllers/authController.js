@@ -12,11 +12,11 @@ const User = require('../models/User');
 const Admin = require('../models/Admin');
 const emailService = require('../services/emailService');
 
-// Relying Party configs — derived from FRONTEND_URL so it works on any domain
+// Relying Party configs for Passkeys — derived from FRONTEND_URL so it works in both dev and prod
 const rpName = 'FreshGrid';
-const frontendUrl = new URL(process.env.FRONTEND_URL || 'http://localhost:5173');
-const rpID = process.env.PASSKEY_RP_ID || frontendUrl.hostname;   // e.g. 'freshgrid.vercel.app' or 'localhost'
-const origin = process.env.FRONTEND_URL || 'http://localhost:5173'; // full URL for origin check
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+const rpID = new URL(frontendUrl).hostname;   // 'localhost' in dev, 'freshgrid-rosy.vercel.app' in prod
+const origin = frontendUrl;                   // full URL required by WebAuthn origin check
 
 // Helpers
 const generateToken = (id, role = 'customer') => {
