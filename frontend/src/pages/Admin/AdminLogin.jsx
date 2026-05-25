@@ -237,19 +237,9 @@ const AdminLogin = () => {
             <style>{`
               .grecaptcha-badge { visibility: hidden !important; }
             `}</style>
-            <div className="mt-8 p-4 bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/30 rounded-xl text-center text-xs text-gray-600 dark:text-gray-300 max-w-sm mx-auto space-y-2 shadow-sm">
-              <div className="flex items-center justify-center gap-1.5 text-primary dark:text-primary-light font-bold text-[13px] uppercase tracking-wider">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M2.166 4.9C2.044 5.344 2 5.81 2 6.287c0 3.79 2.43 6.96 5.833 7.844.536.14.93.585.93 1.144V17a1 1 0 102 0v-1.725c0-.56.394-1.004.93-1.144C15.103 13.25 17.53 10.08 17.53 6.287c0-.478-.044-.943-.166-1.387a1 1 0 00-.777-.718l-6.177-1.235a1 1 0 00-.39 0L3.943 4.182a1 1 0 00-.777.718zM10 6a1 1 0 011 1v2a1 1 0 11-2 0V7a1 1 0 011-1zm0 5a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-                </svg>
-                Secured by reCAPTCHA v3
-              </div>
-              <p className="leading-relaxed font-medium">
-                This portal is protected with high-grade security to prevent automated brute-force attacks.
-              </p>
-              <div className="text-[10px] text-gray-400 dark:text-gray-500 pt-2 border-t border-gray-200/50 dark:border-white/5">
-                Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-light hover:underline font-semibold transition-colors">Privacy Policy</a> & <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-light hover:underline font-semibold transition-colors">Terms of Service</a> apply.
-              </div>
+            <div className="mt-8 text-center text-xs text-gray-400 dark:text-gray-500 max-w-xs mx-auto leading-relaxed border-t border-gray-100 dark:border-white/5 pt-4">
+              Protected by <span className="font-semibold text-gray-600 dark:text-gray-300">reCAPTCHA v3</span>. <br />
+              Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary-light hover:underline font-semibold transition-colors">Privacy Policy</a> & <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" className="text-primary-light hover:underline font-semibold transition-colors">Terms of Service</a> apply.
             </div>
           </>
         )}
