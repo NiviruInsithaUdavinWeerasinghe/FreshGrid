@@ -42,12 +42,17 @@ export const AdminAuthProvider = ({ children }) => {
         const token = res.data.token;
         localStorage.setItem('adminToken', token);
         setIsAdminLoggedIn(true);
-        return true;
+        return { success: true };
       }
-      return false;
+      return { success: false };
     } catch (error) {
+      const status = error.response?.status;
+      const data = error.response?.data || {};
+      if (status === 429) {
+        return { success: false, status: 429, retryAfter: data.retryAfter };
+      }
       console.error('Admin login error:', error);
-      throw error;
+      return { success: false, status };
     }
   };
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 
@@ -10,17 +10,53 @@ const AdminLogin = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [lockoutSeconds, setLockoutSeconds] = useState(0);
+  const lockoutInterval = useRef(null);
+
+  // Countdown timer for lockout
+  useEffect(() => {
+    if (lockoutSeconds > 0) {
+      lockoutInterval.current = setInterval(() => {
+        setLockoutSeconds((s) => {
+          if (s <= 1) {
+            clearInterval(lockoutInterval.current);
+            setError('');
+            return 0;
+          }
+          return s - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(lockoutInterval.current);
+  }, [lockoutSeconds]);
+
+  const formatCountdown = (secs) => {
+    if (secs >= 86400) return `${Math.ceil(secs / 86400)} day(s)`;
+    if (secs >= 3600) {
+      const h = Math.floor(secs / 3600);
+      const m = Math.floor((secs % 3600) / 60);
+      return `${h}h ${m}m`;
+    }
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
 
   const handleLogin = (e) => {
     e.preventDefault();
+    if (lockoutSeconds > 0) return;
     setError('');
     setLoading(true);
 
     setTimeout(async () => {
       try {
-        const success = await login(username, password);
-        if (success) {
+        const result = await login(username, password);
+        if (result.success) {
           navigate('/admin/dashboard');
+        } else if (result.status === 429) {
+          const secs = result.retryAfter || 120;
+          setLockoutSeconds(secs);
+          setError(`Too many failed attempts. Try again in ${formatCountdown(secs)}.`);
         } else {
           setError('Invalid username or password. Please try again.');
         }
@@ -112,18 +148,29 @@ const AdminLogin = () => {
           </div>
 
           {error && (
-            <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-lg text-red-600 dark:text-red-400 text-sm animate-shake">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className={`flex items-start gap-2 p-3 border rounded-lg text-sm ${
+              lockoutSeconds > 0
+                ? 'bg-orange-50 dark:bg-orange-500/10 border-orange-200 dark:border-orange-500/30 text-orange-700 dark:text-orange-400'
+                : 'bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400 animate-shake'
+            }`}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              {error}
+              <div>
+                <p>{lockoutSeconds > 0 ? 'Too many failed attempts. Account temporarily locked.' : error}</p>
+                {lockoutSeconds > 0 && (
+                  <p className="mt-1 font-bold text-lg tabular-nums">
+                    Try again in: {formatCountdown(lockoutSeconds)}
+                  </p>
+                )}
+              </div>
             </div>
           )}
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-primary hover:bg-primary-light text-white font-semibold rounded-lg transition-all shadow-lg shadow-primary/30 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+            disabled={loading || lockoutSeconds > 0}
+            className="w-full py-3 bg-primary hover:bg-primary-light text-white font-semibold rounded-lg transition-all shadow-lg shadow-primary/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>
@@ -133,6 +180,8 @@ const AdminLogin = () => {
                 </svg>
                 Signing In...
               </>
+            ) : lockoutSeconds > 0 ? (
+              <>🔒 Locked — {formatCountdown(lockoutSeconds)}</>
             ) : (
               <>
                 Sign In

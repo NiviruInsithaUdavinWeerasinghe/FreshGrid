@@ -178,6 +178,33 @@ const getMe = async (req, res) => {
 
 // ─── Admin Authentication ──────────────────────────────────────────────────────
 
+// In-memory store: key = IP address, value = { attempts, lockedUntil }
+const loginAttempts = new Map();
+
+// Lockout schedule in seconds — index = number of failed attempts
+// attempts 1-3: no lockout, 4+: escalating lockout
+const LOCKOUT_SCHEDULE = [
+  0,          // 0 attempts (unused)
+  0,          // 1 attempt
+  0,          // 2 attempts
+  0,          // 3 attempts
+  2 * 60,     // 4 attempts  → 2 minutes
+  5 * 60,     // 5 attempts  → 5 minutes
+  10 * 60,    // 6 attempts  → 10 minutes
+  15 * 60,    // 7 attempts  → 15 minutes
+  30 * 60,    // 8 attempts  → 30 minutes
+  60 * 60,    // 9 attempts  → 1 hour
+  6 * 60 * 60,    // 10 attempts → 6 hours
+  24 * 60 * 60,   // 11 attempts → 1 day
+  2 * 24 * 60 * 60,   // 12 attempts → 2 days
+  14 * 24 * 60 * 60,  // 13+ attempts → 14 days
+];
+
+const getLockoutDuration = (attempts) => {
+  const idx = Math.min(attempts, LOCKOUT_SCHEDULE.length - 1);
+  return LOCKOUT_SCHEDULE[idx];
+};
+
 const adminLogin = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -186,15 +213,50 @@ const adminLogin = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Username and password are required.' });
     }
 
+    // Determine client IP (supports proxies like Render/Nginx)
+    const ip = req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket.remoteAddress || 'unknown';
+    const key = `admin_login_${ip}`;
+    const now = Date.now();
+
+    // Retrieve or initialise attempt record
+    let record = loginAttempts.get(key) || { attempts: 0, lockedUntil: 0 };
+
+    // Check if currently locked out
+    if (record.lockedUntil && now < record.lockedUntil) {
+      const retryAfter = Math.ceil((record.lockedUntil - now) / 1000);
+      return res.status(429).json({
+        success: false,
+        message: 'Too many failed login attempts.',
+        retryAfter, // seconds remaining
+      });
+    }
+
     const admin = await Admin.findOne({ username: username.trim() });
-    if (!admin) {
+    const isMatch = admin ? await bcrypt.compare(password, admin.passwordHash) : false;
+
+    if (!admin || !isMatch) {
+      // Increment attempt counter
+      record.attempts += 1;
+      const lockoutDuration = getLockoutDuration(record.attempts);
+      record.lockedUntil = lockoutDuration > 0 ? now + lockoutDuration * 1000 : 0;
+      loginAttempts.set(key, record);
+
+      console.log(`[SECURITY] Admin login failed from ${ip}. Attempts: ${record.attempts}. Lockout: ${lockoutDuration}s`);
+
+      if (lockoutDuration > 0) {
+        return res.status(429).json({
+          success: false,
+          message: 'Too many failed login attempts.',
+          retryAfter: lockoutDuration,
+        });
+      }
+
       return res.status(401).json({ success: false, message: 'Invalid admin credentials.' });
     }
 
-    const isMatch = await bcrypt.compare(password, admin.passwordHash);
-    if (!isMatch) {
-      return res.status(401).json({ success: false, message: 'Invalid admin credentials.' });
-    }
+    // Success — reset attempt counter
+    loginAttempts.delete(key);
+    console.log(`[SECURITY] Admin login successful from ${ip}`);
 
     res.status(200).json({
       success: true,
