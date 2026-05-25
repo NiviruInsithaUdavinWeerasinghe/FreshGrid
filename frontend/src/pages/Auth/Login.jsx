@@ -24,7 +24,7 @@ const Login = () => {
   const [isCheckingEmail, setIsCheckingEmail] = useState(false);
   const [prefetchedPasskeyData, setPrefetchedPasskeyData] = useState(null);
 
-  // Check query params for verification messages
+  // Check query params for verification messages or OAuth errors
   useEffect(() => {
     const verified = searchParams.get('verified');
     const error = searchParams.get('error');
@@ -40,6 +40,21 @@ const Login = () => {
         text: error === 'invalid_or_expired'
           ? 'Verification link was invalid or has expired.'
           : 'Email verification failed.',
+      });
+    } else if (error === 'oauth_retry') {
+      setInfoMessage({
+        type: 'error',
+        text: 'Facebook sign-in was processed — if you are not logged in yet, please try again.',
+      });
+    } else if (error === 'facebook_auth_failed') {
+      setInfoMessage({
+        type: 'error',
+        text: 'Facebook sign-in failed. Please try again or use another login method.',
+      });
+    } else if (error === 'google_auth_failed') {
+      setInfoMessage({
+        type: 'error',
+        text: 'Google sign-in failed. Please try again or use another login method.',
       });
     }
   }, [searchParams]);
