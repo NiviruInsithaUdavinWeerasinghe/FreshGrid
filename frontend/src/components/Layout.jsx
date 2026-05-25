@@ -11,8 +11,16 @@ const Layout = () => {
 
   if (isAuthPage) {
     return (
-      <div key={location.key} className="page-enter">
-        <Outlet />
+      <div className="flex flex-col min-h-screen relative">
+        <Navbar />
+        <FloatingNav />
+        <div className="flex-grow px-4 sm:px-6 lg:px-8">
+          <main className="w-full max-w-[85rem] mx-auto py-8 overflow-x-hidden">
+            <div key={location.key} className="page-enter">
+              <Outlet />
+            </div>
+          </main>
+        </div>
       </div>
     );
   }
