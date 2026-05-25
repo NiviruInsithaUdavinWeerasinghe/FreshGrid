@@ -1,5 +1,6 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const Product = require('../models/Product');
+const Offer = require('../models/Offer');
 const ChatHistory = require('../models/ChatHistory');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -192,13 +193,34 @@ exports.processChatMessage = async (req, res) => {
           ]
         }).limit(10);
       }
+      
+      // Search for Offers (bundles)
+      const relevantOffers = await Offer.find({
+        isActive: true,
+        offerType: 'BUNDLE_PACKAGE',
+        $or: [
+          { title: { $regex: regexPattern, $options: 'i' } },
+          { 'config.description': { $regex: regexPattern, $options: 'i' } }
+        ]
+      }).limit(5);
+
+      // Append offers as if they were products
+      for (const offer of relevantOffers) {
+        relevantProducts.push({
+          _id: offer._id,
+          name: offer.title,
+          price: offer.config.bundlePackagePrice,
+          inStock: offer.isActive,
+          isBundle: true
+        });
+      }
     }
 
     const contextStr = `
 Current Page: ${activePage || '/'}
 Cart State: ${JSON.stringify(cartState || [])}
 Current Payment Method: ${paymentMethod || 'Card'}
-Relevant Products from DB: ${JSON.stringify(relevantProducts.map(p => ({id: p._id, name: p.name, price: p.price, inStock: p.inStock})))}
+Relevant Products from DB: ${JSON.stringify(relevantProducts.map(p => ({id: p._id, name: p.name, price: p.price, inStock: p.inStock, isBundle: p.isBundle || false})))}
 User Message: ${message}`;
 
     // 2. Fetch or create ChatHistory
@@ -305,12 +327,19 @@ User Message: ${message}`;
               }
             }
             if (!hasError && call.args.productId) {
-              const product = await Product.findById(call.args.productId);
+              let product = await Product.findById(call.args.productId);
               if (!product) {
-                validationResult = { success: false, error: `Product ID ${call.args.productId} not found in database.` };
+                const offer = await Offer.findById(call.args.productId);
+                if (offer && offer.offerType === 'BUNDLE_PACKAGE') {
+                  product = { name: offer.title, inStock: offer.isActive };
+                }
+              }
+
+              if (!product) {
+                validationResult = { success: false, error: `Product/Bundle ID ${call.args.productId} not found in database.` };
                 hasError = true;
               } else if (!product.inStock) {
-                validationResult = { success: false, error: `Product ${product.name} is strictly OUT OF STOCK. Do not add it. Apologize to the user.` };
+                validationResult = { success: false, error: `Product/Bundle ${product.name} is strictly OUT OF STOCK or INACTIVE. Do not add it. Apologize to the user.` };
                 hasError = true;
               }
             }
