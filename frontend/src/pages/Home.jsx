@@ -52,7 +52,7 @@ const Home = () => {
   return (
     <div className="space-y-24 pb-12">
       {/* Hero Section */}
-      <section id="hero" className="relative pt-12 lg:pt-20 flex flex-col lg:flex-row items-center gap-12 overflow-hidden">
+      <section id="hero" className="relative flex flex-col lg:flex-row items-center gap-12 overflow-hidden">
         <div className="lg:w-1/2 space-y-8 z-10">
           <div className="inline-block px-4 py-1.5 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light font-medium rounded-full text-sm border border-primary/20">
             100% Organic & Local

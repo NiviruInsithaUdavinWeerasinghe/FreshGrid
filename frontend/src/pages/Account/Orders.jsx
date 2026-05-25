@@ -103,7 +103,7 @@ export default function Orders() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6">
+    <div className="max-w-4xl mx-auto pb-8 px-4 sm:px-6">
       <div className="flex items-center gap-3 mb-8">
         <div className="p-3 bg-primary/10 rounded-2xl">
           <Package className="w-6 h-6 text-primary" />

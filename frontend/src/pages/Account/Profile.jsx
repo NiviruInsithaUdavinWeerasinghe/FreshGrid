@@ -269,7 +269,7 @@ const Profile = () => {
   if (!user) return null;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
+    <div className="max-w-4xl mx-auto px-4 pb-12">
       <div className="glass-panel rounded-3xl shadow-xl overflow-hidden relative">
         {/* Top visual brand banner */}
         <div className="h-32 bg-gradient-to-r from-primary to-primary-light relative flex items-end px-8 pb-4">

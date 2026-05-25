@@ -166,7 +166,7 @@ const Cart = () => {
 
 
   return (
-    <div className="py-8 max-w-6xl mx-auto">
+    <div className="pb-8 max-w-6xl mx-auto">
 
       {/* Page Header */}
       <div className="flex items-center gap-3 mb-8">
