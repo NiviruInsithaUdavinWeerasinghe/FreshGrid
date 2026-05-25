@@ -81,7 +81,7 @@ const registerUser = async (req, res) => {
 
     await user.save();
 
-    const verifyUrl = `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/auth/verify-email/${verificationToken}`;
+    const verifyUrl = `${process.env.BACKEND_URL || 'https://freshgrid-backend.onrender.com'}/api/auth/verify-email/${verificationToken}`;
     
     // Send email asynchronously
     emailService.sendVerificationEmail(emailLower, name, verifyUrl).catch(err => console.error("Email send failed:", err));

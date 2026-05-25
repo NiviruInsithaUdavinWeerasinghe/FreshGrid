@@ -3,63 +3,118 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-// SendGrid sends over HTTPS (port 443) — works on Render free plan.
-// Nodemailer SMTP (ports 25/465/587) is firewall-blocked by Render free plan.
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const FROM = { email: process.env.GMAIL_USER, name: 'FreshGrid' };
 
-// ─── Welcome Email ─────────────────────────────────────────────────────────────
+// ─── Shared Design Tokens ───────────────────────────────────────────────────────
+const green      = '#059669';
+const greenDark  = '#047857';
+const greenLight = '#ecfdf5';
+const greenMid   = '#d1fae5';
+const textDark   = '#111827';
+const textMid    = '#374151';
+const textLight  = '#6b7280';
+const bgPage     = '#f0fdf4';
+const bgCard     = '#ffffff';
+
+const baseStyles = `
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: ${bgPage}; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  .wrapper { background-color: ${bgPage}; padding: 40px 16px; }
+  .card { max-width: 600px; margin: 0 auto; background: ${bgCard}; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 60px rgba(5,150,105,0.12), 0 4px 16px rgba(0,0,0,0.06); }
+  .header { background: linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%); padding: 48px 32px 40px; text-align: center; position: relative; }
+  .header-logo { font-size: 36px; margin-bottom: 8px; }
+  .header-brand { color: #ffffff; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin: 0; }
+  .header-tagline { color: rgba(255,255,255,0.8); font-size: 13px; margin-top: 6px; letter-spacing: 1px; text-transform: uppercase; }
+  .body { padding: 48px 40px; }
+  .badge { display: inline-block; background: ${greenLight}; color: ${green}; border: 1px solid ${greenMid}; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 6px 14px; border-radius: 999px; margin-bottom: 24px; }
+  .heading { font-size: 26px; font-weight: 800; color: ${textDark}; line-height: 1.25; margin-bottom: 16px; }
+  .subheading { font-size: 16px; color: ${textMid}; line-height: 1.7; margin-bottom: 24px; }
+  .divider { height: 1px; background: linear-gradient(90deg, transparent, ${greenMid}, transparent); margin: 32px 0; }
+  .btn-wrap { text-align: center; margin: 36px 0; }
+  .btn { display: inline-block; background: linear-gradient(135deg, ${green}, ${greenDark}); color: #ffffff !important; text-decoration: none; padding: 16px 40px; border-radius: 999px; font-size: 16px; font-weight: 700; letter-spacing: 0.3px; box-shadow: 0 8px 24px rgba(5,150,105,0.35); }
+  .feature-box { background: linear-gradient(135deg, ${greenLight}, #f0fdf4); border: 1px solid ${greenMid}; border-radius: 16px; padding: 28px; margin: 28px 0; }
+  .feature-title { font-size: 14px; font-weight: 700; color: ${green}; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+  .feature-item { display: flex; align-items: flex-start; margin-bottom: 12px; }
+  .feature-icon { font-size: 18px; margin-right: 12px; flex-shrink: 0; }
+  .feature-text { font-size: 15px; color: #065f46; font-weight: 500; line-height: 1.4; }
+  .fallback-link { font-size: 12px; color: ${textLight}; line-height: 1.6; text-align: center; word-break: break-all; }
+  .fallback-link a { color: ${green}; }
+  .footer { background: #f9fafe; border-top: 1px solid #e5e7eb; padding: 28px 40px; text-align: center; }
+  .footer p { font-size: 12px; color: ${textLight}; line-height: 1.8; }
+  .footer a { color: ${green}; text-decoration: none; }
+  .stat-row { display: flex; gap: 12px; margin: 24px 0; }
+  .stat-box { flex: 1; background: ${greenLight}; border-radius: 12px; padding: 16px; text-align: center; }
+  .stat-num { font-size: 22px; font-weight: 800; color: ${green}; }
+  .stat-lbl { font-size: 11px; color: #065f46; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+  .offer-card { border: 2px solid ${greenMid}; border-radius: 16px; padding: 24px; margin: 20px 0; text-align: left; }
+  .offer-label { font-size: 11px; font-weight: 700; color: ${green}; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+  .offer-name { font-size: 20px; font-weight: 800; color: ${textDark}; margin-bottom: 8px; }
+  .offer-detail { font-size: 14px; color: ${textMid}; line-height: 1.6; }
+  .price-highlight { font-size: 28px; font-weight: 800; color: ${green}; }
+  .price-original { font-size: 16px; color: ${textLight}; text-decoration: line-through; margin-left: 8px; }
+`;
+
+// ─── Welcome Email ──────────────────────────────────────────────────────────────
 
 const sendWelcomeEmail = async (email, name) => {
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <title>Welcome to Fresh Club VIP!</title>
-      <style>
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f9fafb; margin: 0; padding: 0; }
-        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-        .header { background-color: #059669; padding: 40px 20px; text-align: center; }
-        .header h1 { color: #ffffff; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
-        .content { padding: 40px 30px; color: #374151; line-height: 1.6; font-size: 16px; }
-        .content h2 { color: #111827; font-size: 22px; margin-top: 0; }
-        .cta-container { text-align: center; margin: 30px 0; }
-        .cta-button { display: inline-block; background-color: #059669; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 9999px; font-weight: bold; font-size: 16px; }
-        .features { background-color: #ecfdf5; border-radius: 12px; padding: 20px; margin: 30px 0; }
-        .features p { margin: 10px 0; color: #065f46; font-weight: 500; }
-        .footer { background-color: #f3f4f6; padding: 24px; text-align: center; color: #6b7280; font-size: 13px; border-top: 1px solid #e5e7eb; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header"><h1>🌱 FreshGrid</h1></div>
-        <div class="content">
-          <h2>Welcome to Fresh Club VIP, ${name}!</h2>
-          <p>We're absolutely thrilled to have you join our community. As a VIP member, you'll be the first to know about our freshest harvests, exclusive discounts, and special bundles straight from local farms to your door.</p>
-          <div class="features">
-            <p>✨ <strong>What to expect:</strong></p>
-            <p>🚚 Exclusive Free Delivery Offers</p>
-            <p>🍎 Early Access to Seasonal Produce</p>
-            <p>🎁 Secret VIP-only Bundles</p>
-          </div>
-          <p>Thank you for supporting local farmers and sustainable agriculture. We can't wait to deliver the best nature has to offer right to your kitchen.</p>
-          <div class="cta-container">
-            <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/shop" class="cta-button">Shop Fresh Now</a>
-          </div>
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Welcome to Fresh Club VIP</title>
+<style>${baseStyles}</style></head>
+<body>
+<div class="wrapper">
+  <div class="card">
+    <div class="header">
+      <div class="header-logo">🌱</div>
+      <h1 class="header-brand">FreshGrid</h1>
+      <p class="header-tagline">Farm to Table · Sri Lanka</p>
+    </div>
+    <div class="body">
+      <div class="badge">🎉 VIP Member</div>
+      <h2 class="heading">You're officially in the club, ${name}!</h2>
+      <p class="subheading">Welcome to <strong>Fresh Club VIP</strong> — your passport to the freshest produce, exclusive deals, and farm-to-table magic delivered straight to your door.</p>
+
+      <div class="divider"></div>
+
+      <div class="feature-box">
+        <div class="feature-title">✨ Your VIP Benefits</div>
+        <div class="feature-item">
+          <span class="feature-icon">🚚</span>
+          <span class="feature-text"><strong>Free Delivery Offers</strong> — exclusive subsidized delivery just for members</span>
         </div>
-        <div class="footer">
-          <p>© ${new Date().getFullYear()} FreshGrid. All rights reserved.</p>
-          <p>You received this email because you subscribed to Fresh Club VIP.</p>
+        <div class="feature-item">
+          <span class="feature-icon">🍎</span>
+          <span class="feature-text"><strong>Early Harvest Access</strong> — be first to grab seasonal produce before it sells out</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">🎁</span>
+          <span class="feature-text"><strong>Secret VIP Bundles</strong> — members-only curated bundles at unbeatable prices</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">⚡</span>
+          <span class="feature-text"><strong>Flash Sale Priority</strong> — get notified first when limited offers drop</span>
         </div>
       </div>
-    </body>
-    </html>
-  `;
+
+      <div class="btn-wrap">
+        <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/shop" class="btn">Start Shopping Fresh →</a>
+      </div>
+
+      <p style="font-size:13px; color:${textLight}; text-align:center; line-height:1.6;">Thank you for supporting local Sri Lankan farmers and sustainable agriculture. 🌿</p>
+    </div>
+    <div class="footer">
+      <p>© ${new Date().getFullYear()} FreshGrid · Farm to Table Sri Lanka</p>
+      <p style="margin-top:6px;">You're receiving this because you joined <strong>Fresh Club VIP</strong>.</p>
+    </div>
+  </div>
+</div>
+</body></html>`;
 
   try {
-    await sgMail.send({ from: FROM, to: email, subject: 'Welcome to Fresh Club VIP! 🎁', html });
+    await sgMail.send({ from: FROM, to: email, subject: '🎉 Welcome to Fresh Club VIP — You\'re in!', html });
     console.log('[EMAIL] Welcome email sent to:', email);
     return true;
   } catch (error) {
@@ -68,96 +123,103 @@ const sendWelcomeEmail = async (email, name) => {
   }
 };
 
-// ─── Promotion Emails ───────────────────────────────────────────────────────────
+// ─── Promotion Email ────────────────────────────────────────────────────────────
 
 const sendPromotionEmails = async (emails, offerData) => {
   if (!emails || emails.length === 0) return;
 
-  let detailsHtml = '';
+  let offerDetailHtml = '';
+
   if (offerData.offerType === 'DELIVERY_SUBSIDY_OR_WEIGHT') {
-    detailsHtml = `
-      <div style="background-color:#ecfdf5; border:1px solid #a7f3d0; border-radius:12px; padding:20px; margin:20px 0; text-align:left;">
-        <h3 style="margin-top:0; color:#065f46;">Delivery Subsidy Offer</h3>
-        <ul style="color:#065f46; margin:0; padding-left:20px;">
-          ${offerData.config.waiveBaseFee ? '<li><strong>Free Base Delivery!</strong></li>' : ''}
-          ${offerData.config.minCartValue ? `<li>Minimum Cart Value: <strong>Rs. ${offerData.config.minCartValue}</strong></li>` : ''}
-          ${offerData.config.discountedWeightRate ? `<li>Discounted Weight Rate: <strong>Rs. ${offerData.config.discountedWeightRate}/kg</strong></li>` : ''}
-        </ul>
-      </div>
-    `;
+    const perks = [];
+    if (offerData.config.waiveBaseFee) perks.push(`<div class="feature-item"><span class="feature-icon">🚚</span><span class="feature-text"><strong>Free Base Delivery Fee</strong> — waived completely!</span></div>`);
+    if (offerData.config.minCartValue) perks.push(`<div class="feature-item"><span class="feature-icon">🛒</span><span class="feature-text">Minimum cart value: <strong>Rs. ${offerData.config.minCartValue}</strong></span></div>`);
+    if (offerData.config.discountedWeightRate) perks.push(`<div class="feature-item"><span class="feature-icon">⚖️</span><span class="feature-text">Discounted weight rate: <strong>Rs. ${offerData.config.discountedWeightRate}/kg</strong></span></div>`);
+    offerDetailHtml = `
+      <div class="offer-card">
+        <div class="offer-label">🚚 Delivery Subsidy Offer</div>
+        ${perks.join('')}
+      </div>`;
   } else if (offerData.offerType === 'MULTI_BUY') {
     const productName = offerData.config.targetProductId?.name || 'Select Products';
     const originalPrice = offerData.config.targetProductId?.price;
-    detailsHtml = `
-      <div style="background-color:#ecfdf5; border:1px solid #a7f3d0; border-radius:12px; padding:20px; margin:20px 0; text-align:left;">
-        <h3 style="margin-top:0; color:#065f46;">Multi-Buy Discount</h3>
-        <p style="margin:0; color:#065f46;">Buy at least <strong>${offerData.config.minQuantity}</strong> of <strong>${productName}</strong> and get it for <strong>Rs. ${offerData.config.discountedUnitPrice}</strong> each! <span style="text-decoration:line-through; color:#9ca3af; font-size:14px; margin-left:8px;">(Regularly Rs. ${originalPrice})</span></p>
-      </div>
-    `;
+    offerDetailHtml = `
+      <div class="offer-card">
+        <div class="offer-label">📦 Multi-Buy Deal</div>
+        <div class="offer-name">${productName}</div>
+        <div style="margin: 12px 0;">
+          <span class="price-highlight">Rs. ${offerData.config.discountedUnitPrice}</span>
+          ${originalPrice ? `<span class="price-original">Rs. ${originalPrice}</span>` : ''}
+          <span style="font-size:13px; color:${textMid}"> per unit</span>
+        </div>
+        <div class="offer-detail">Buy at least <strong>${offerData.config.minQuantity} units</strong> to unlock this exclusive price.</div>
+      </div>`;
   } else if (offerData.offerType === 'BUNDLE_PACKAGE') {
     let originalTotal = 0;
     const productsList = (offerData.config.bundleProducts || []).map(bp => {
       const pName = bp.productId?.name || 'Product';
       const pPrice = bp.productId?.price || 0;
       originalTotal += pPrice * bp.quantity;
-      return `<li>${bp.quantity}x ${pName} <span style="color:#9ca3af;">(Rs. ${pPrice} each)</span></li>`;
+      return `<div class="feature-item"><span class="feature-icon">🌿</span><span class="feature-text">${bp.quantity}× <strong>${pName}</strong> <span style="color:${textLight}">(Rs. ${pPrice} each)</span></span></div>`;
     }).join('');
-    detailsHtml = `
-      <div style="background-color:#ecfdf5; border:1px solid #a7f3d0; border-radius:12px; padding:20px; margin:20px 0; text-align:left;">
-        <h3 style="margin-top:0; color:#065f46;">
-          Bundle Package for Rs. ${offerData.config.bundlePackagePrice}
-          <span style="text-decoration:line-through; color:#9ca3af; font-size:16px; margin-left:8px; font-weight:normal;">(Value: Rs. ${originalTotal})</span>
-        </h3>
-        <ul style="color:#065f46; margin:0; padding-left:20px;">${productsList}</ul>
-      </div>
-    `;
+    const savings = originalTotal - offerData.config.bundlePackagePrice;
+    offerDetailHtml = `
+      <div class="offer-card">
+        <div class="offer-label">🎁 Bundle Package</div>
+        <div style="margin-bottom:16px;">
+          <span class="price-highlight">Rs. ${offerData.config.bundlePackagePrice}</span>
+          <span class="price-original">Rs. ${originalTotal}</span>
+        </div>
+        ${savings > 0 ? `<div style="display:inline-block; background:#fef3c7; color:#92400e; padding:4px 12px; border-radius:999px; font-size:12px; font-weight:700; margin-bottom:16px;">Save Rs. ${savings}!</div>` : ''}
+        <div class="feature-title" style="margin-bottom:12px;">What's in the bundle:</div>
+        ${productsList}
+      </div>`;
   }
 
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <title>FreshGrid Special Offer</title>
-      <style>
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f9fafb; margin: 0; padding: 0; }
-        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .header { background-color: #059669; padding: 30px 20px; text-align: center; }
-        .header h1 { color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
-        .hero-image { width: 100%; height: auto; max-height: 250px; object-fit: cover; }
-        .content { padding: 40px 30px; color: #374151; line-height: 1.6; font-size: 16px; text-align: center; }
-        .badge { display: inline-block; background-color: #ecfdf5; color: #059669; padding: 6px 12px; border-radius: 9999px; font-size: 14px; font-weight: bold; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
-        .title { color: #111827; font-size: 26px; font-weight: 800; margin: 0 0 16px 0; }
-        .cta-button { display: inline-block; background-color: #059669; color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 9999px; font-weight: bold; font-size: 16px; }
-        .footer { background-color: #f3f4f6; padding: 24px; text-align: center; color: #6b7280; font-size: 13px; border-top: 1px solid #e5e7eb; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header"><h1>🌱 FreshGrid</h1></div>
-        ${offerData.config.image ? `<img src="${offerData.config.image}" alt="Special Offer" class="hero-image" />` : ''}
-        <div class="content">
-          <div class="badge">Special Offer</div>
-          <h2 class="title">${offerData.title}</h2>
-          <p>${offerData.config.description || 'Log in to your FreshGrid account to check out our latest special offer!'}</p>
-          ${detailsHtml}
-          <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/shop" class="cta-button">Claim Offer Now</a>
-        </div>
-        <div class="footer">
-          <p>Valid until ${new Date(offerData.validTo).toLocaleDateString()}</p>
-          <p>© ${new Date().getFullYear()} FreshGrid. All rights reserved.</p>
-        </div>
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FreshGrid Special Offer</title>
+<style>${baseStyles}</style></head>
+<body>
+<div class="wrapper">
+  <div class="card">
+    <div class="header">
+      ${offerData.config.image ? `<img src="${offerData.config.image}" alt="${offerData.title}" style="width:100%;max-height:220px;object-fit:cover;border-radius:0;display:block;margin-bottom:24px;" />` : ''}
+      <div class="header-logo">🔥</div>
+      <h1 class="header-brand">Special Offer</h1>
+      <p class="header-tagline">Exclusive for Fresh Club VIP Members</p>
+    </div>
+    <div class="body" style="text-align:center;">
+      <div class="badge">⚡ Limited Time</div>
+      <h2 class="heading">${offerData.title}</h2>
+      <p class="subheading">${offerData.config.description || 'An exclusive offer just for FreshGrid VIP members. Don\'t miss out!'}</p>
+
+      ${offerDetailHtml}
+
+      <div class="divider"></div>
+
+      <p style="font-size:14px; color:${textLight}; margin-bottom:24px;">⏰ Valid until <strong style="color:${textDark};">${new Date(offerData.validTo).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' })}</strong></p>
+
+      <div class="btn-wrap">
+        <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/shop" class="btn">Claim This Offer →</a>
       </div>
-    </body>
-    </html>
-  `;
+
+      <p style="font-size:12px; color:${textLight};">Log into your FreshGrid account to apply this offer at checkout.</p>
+    </div>
+    <div class="footer">
+      <p>© ${new Date().getFullYear()} FreshGrid · Farm to Table Sri Lanka</p>
+      <p style="margin-top:6px;">You're receiving this as a <strong>Fresh Club VIP</strong> member.</p>
+    </div>
+  </div>
+</div>
+</body></html>`;
 
   try {
     await sgMail.send({
       from: FROM,
       to: process.env.GMAIL_USER,
       bcc: emails,
-      subject: '🔥 FreshGrid Special Offer: ' + offerData.title,
+      subject: `🔥 FreshGrid VIP Offer: ${offerData.title}`,
       html,
     });
     console.log('[EMAIL] Promotion email sent to %d subscribers', emails.length);
@@ -171,41 +233,64 @@ const sendPromotionEmails = async (emails, offerData) => {
 // ─── Verification Email ─────────────────────────────────────────────────────────
 
 const sendVerificationEmail = async (email, name, verificationUrl) => {
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <title>Verify your FreshGrid Account</title>
-      <style>
-        body { font-family: 'Inter', -apple-system, sans-serif; background-color: #f9fafb; margin: 0; padding: 0; }
-        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .header { background-color: #059669; padding: 40px 20px; text-align: center; }
-        .header h1 { color: #ffffff; margin: 0; font-size: 28px; font-weight: 800; }
-        .content { padding: 40px 30px; color: #374151; line-height: 1.6; font-size: 16px; text-align: center; }
-        .cta-button { display: inline-block; background-color: #059669; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 9999px; font-weight: bold; font-size: 16px; margin: 30px 0; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header"><h1>🌱 FreshGrid</h1></div>
-        <div class="content">
-          <h2>Hello ${name}!</h2>
-          <p>Thanks for joining FreshGrid. We're excited to have you on board!</p>
-          <p>Please click the button below to verify your email address and activate your account.</p>
-          <a href="${verificationUrl}" class="cta-button">Verify Email Address</a>
-          <p style="font-size: 13px; color: #6b7280; margin-top: 30px;">If the button doesn't work, copy and paste this link into your browser:<br>${verificationUrl}</p>
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Verify your FreshGrid Account</title>
+<style>${baseStyles}
+.steps { counter-reset: step; margin: 24px 0; }
+.step  { display: flex; align-items: flex-start; margin-bottom: 14px; }
+.step-num { width: 28px; height: 28px; min-width: 28px; background: ${green}; color: #fff; border-radius: 50%; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-right: 14px; }
+.step-text { font-size: 14px; color: ${textMid}; line-height: 1.5; padding-top: 4px; }
+</style></head>
+<body>
+<div class="wrapper">
+  <div class="card">
+    <div class="header">
+      <div class="header-logo">🌱</div>
+      <h1 class="header-brand">FreshGrid</h1>
+      <p class="header-tagline">Verify your account</p>
+    </div>
+    <div class="body" style="text-align:center;">
+      <div class="badge">✉️ Email Verification</div>
+      <h2 class="heading">Hello, ${name}! 👋</h2>
+      <p class="subheading">You're almost there! Just one click to verify your email address and unlock your FreshGrid account.</p>
+
+      <div class="btn-wrap">
+        <a href="${verificationUrl}" class="btn">✅ Verify My Email Address</a>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="feature-box" style="text-align:left;">
+        <div class="feature-title">What happens next?</div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-text">Click the button above to verify your email</div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-text">You'll be redirected back to login automatically</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-text">Start browsing fresh produce from local farms 🥬</div></div>
         </div>
       </div>
-    </body>
-    </html>
-  `;
+
+      <div class="divider"></div>
+
+      <div class="fallback-link">
+        <p>Button not working? Copy and paste this link into your browser:</p>
+        <p style="margin-top:8px;"><a href="${verificationUrl}">${verificationUrl}</a></p>
+        <p style="margin-top:12px; color:#9ca3af;">This link expires in <strong>24 hours</strong>.</p>
+      </div>
+    </div>
+    <div class="footer">
+      <p>© ${new Date().getFullYear()} FreshGrid · Farm to Table Sri Lanka</p>
+      <p style="margin-top:6px;">If you didn't create an account, you can safely ignore this email.</p>
+    </div>
+  </div>
+</div>
+</body></html>`;
 
   try {
     await sgMail.send({
       from: FROM,
       to: email,
-      subject: 'Verify your FreshGrid Account 🌱',
+      subject: '✅ Verify your FreshGrid Account',
       html,
     });
     console.log('[EMAIL] Verification email sent to:', email);
