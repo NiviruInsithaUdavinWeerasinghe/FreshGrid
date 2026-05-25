@@ -6,6 +6,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import ProductsManagement from './ProductsManagement';
 import SpecialOffers from './SpecialOffers';
 import OrdersManagement from './OrdersManagement';
+import { useIdleTimeout } from '../../hooks/useIdleTimeout';
 
 /* ─── Sidebar Nav Item ─── */
 const NavItem = ({ icon, label, active, onClick, badge }) => (
@@ -405,6 +406,12 @@ const Dashboard = () => {
     navigate('/admin');
   };
 
+  const { isWarning, secondsRemaining, resetTimer } = useIdleTimeout({
+    timeout: 15 * 60 * 1000, // 15 minutes
+    warningTime: 60 * 1000,  // 60 seconds warning
+    onIdle: handleLogout,
+  });
+
   const pageTitles = {
     overview: 'Dashboard Overview',
     products: 'Product Management',
@@ -473,6 +480,34 @@ const Dashboard = () => {
           {activePage === 'orders' && <OrdersManagement />}
         </div>
       </main>
+
+      {/* Idle Timeout Warning Modal */}
+      {isWarning && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center space-y-5 animate-shake">
+            <div className="w-16 h-16 bg-orange-100 dark:bg-orange-500/20 rounded-full flex items-center justify-center mx-auto text-orange-600 dark:text-orange-400">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Inactivity Warning</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                You will be automatically logged out due to inactivity to secure your session.
+              </p>
+            </div>
+            <div className="text-4xl font-extrabold text-orange-600 dark:text-orange-400 tabular-nums">
+              {secondsRemaining}s
+            </div>
+            <button
+              onClick={resetTimer}
+              className="w-full py-3 bg-primary hover:bg-primary-light text-white font-semibold rounded-xl transition-all shadow-lg shadow-primary/30 flex items-center justify-center gap-2"
+            >
+              Continue Session
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
