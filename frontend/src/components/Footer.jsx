@@ -52,15 +52,15 @@ const Footer = () => {
               Your premium marketplace for the freshest farm-to-table produce, baked goods, and everyday essentials. We bridge the gap between local farmers and your kitchen.
             </p>
             <div className="flex gap-4 mt-auto">
-              <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-white/5 flex items-center justify-center text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-all cursor-pointer">
+              <a href="https://facebook.com/freshgrid" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-white/5 flex items-center justify-center text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-all cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-              </div>
-              <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-white/5 flex items-center justify-center text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-all cursor-pointer">
+              </a>
+              <a href="https://instagram.com/freshgrid" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-white/5 flex items-center justify-center text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-all cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-              </div>
-              <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-white/5 flex items-center justify-center text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-all cursor-pointer">
+              </a>
+              <a href="https://twitter.com/freshgrid" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-white/5 flex items-center justify-center text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-all cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
-              </div>
+              </a>
             </div>
           </div>
 
@@ -68,8 +68,8 @@ const Footer = () => {
           <div className="lg:col-span-3">
             <h3 className="text-gray-800 dark:text-gray-200 mb-4 uppercase tracking-wider text-sm font-extrabold">Quick Links</h3>
             <ul className="space-y-3">
-              {['Shop', 'About', 'Cart', 'Admin Portal'].map((link) => {
-                const path = link === 'Admin Portal' ? '/admin' : `/${link.toLowerCase().replace(' ', '-')}`;
+              {['Shop', 'About', 'Cart'].map((link) => {
+                const path = `/${link.toLowerCase().replace(' ', '-')}`;
                 return (
                   <li key={link}>
                     <Link to={path} className="text-sm text-gray-600 hover:text-emerald-600 dark:text-gray-400 dark:hover:text-emerald-400 transition-colors flex items-center gap-2 group">
@@ -148,9 +148,9 @@ const Footer = () => {
             &copy; {new Date().getFullYear()} FreshGrid. All rights reserved.
           </div>
           <div className="flex items-center gap-4 text-xs font-medium text-gray-400 dark:text-gray-500">
-            <a href="#" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Privacy Policy</a>
+            <span className="cursor-default">Privacy Policy</span>
             <span>•</span>
-            <a href="#" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Terms of Service</a>
+            <span className="cursor-default">Terms of Service</span>
           </div>
         </div>
       </div>
