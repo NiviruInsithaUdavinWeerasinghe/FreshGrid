@@ -52,7 +52,7 @@ const Home = () => {
   return (
     <div className="space-y-24 pb-12">
       {/* Hero Section */}
-      <section className="relative pt-12 lg:pt-20 flex flex-col lg:flex-row items-center gap-12 overflow-hidden">
+      <section id="hero" className="relative pt-12 lg:pt-20 flex flex-col lg:flex-row items-center gap-12 overflow-hidden">
         <div className="lg:w-1/2 space-y-8 z-10">
           <div className="inline-block px-4 py-1.5 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light font-medium rounded-full text-sm border border-primary/20">
             100% Organic & Local
@@ -91,7 +91,7 @@ const Home = () => {
       </section>
 
       {/* Featured Products */}
-      <section>
+      <section id="featured-harvest">
         <div className="flex justify-between items-end mb-10">
           <div>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">Featured Harvest</h2>
@@ -134,7 +134,7 @@ const Home = () => {
       </section>
 
       {/* How it Works */}
-      <section className="glass-panel rounded-3xl p-8 md:p-16">
+      <section id="how-it-works" className="glass-panel rounded-3xl p-8 md:p-16">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">How FreshGrid Works</h2>
           <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">From the soil to your kitchen in three simple steps.</p>
