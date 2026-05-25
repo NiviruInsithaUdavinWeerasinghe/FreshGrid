@@ -11,24 +11,31 @@ const Layout = () => {
 
   if (isAuthPage) {
     return (
-      <div className="h-screen flex flex-col overflow-hidden bg-gray-50 dark:bg-charcoal is-auth-layout">
+      <div className="h-screen w-screen overflow-hidden bg-gray-50 dark:bg-charcoal relative flex flex-col">
         <style>{`
-          .is-auth-layout .min-h-screen {
-            min-height: unset !important;
-            background-color: transparent !important;
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-            height: auto !important;
+          /* Lock window height and let inner layout handle scroll naturally if needed */
+          html, body {
+            overflow: hidden !important;
+            height: 100% !important;
+          }
+          /* Override 100vh constraints on inner auth pages so they fit flex height */
+          .page-enter > div {
+            min-height: 100% !important;
+            height: 100% !important;
+            background: transparent !important;
+            padding-top: 90px !important; /* Clear floated Navbar space */
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
           }
         `}</style>
-        <div className="flex-shrink-0 z-50">
+        {/* Float header absolutely to avoid displacing document flow height */}
+        <div className="absolute top-0 left-0 w-full z-50">
           <Navbar />
         </div>
         <FloatingNav />
-        <div className="flex-grow overflow-y-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center py-6">
-          <div key={location.key} className="page-enter w-full flex items-center justify-center">
-            <Outlet />
-          </div>
+        <div key={location.key} className="page-enter flex-grow overflow-y-auto w-full h-full">
+          <Outlet />
         </div>
       </div>
     );
