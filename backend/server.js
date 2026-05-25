@@ -72,6 +72,7 @@ const deliveryRoutes = require('./src/routes/deliveryRoutes');
 const orderRoutes = require('./src/routes/orderRoutes');
 const offerRoutes = require('./src/routes/offerRoutes');
 const chatRoutes = require('./src/routes/chatRoutes');
+const contactRoutes = require('./src/routes/contactRoutes');
 
 // Use Routes
 app.use('/api/products', productRoutes);
@@ -81,6 +82,7 @@ app.use('/api/delivery', deliveryRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/offers', offerRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/contact', contactRoutes);
 
 app.listen(PORT, () => { // Start the Express server and have it listen for incoming connections on the specified port
   console.log(`Server is running on port ${PORT}`); // Log a success message to the console when the server starts successfully

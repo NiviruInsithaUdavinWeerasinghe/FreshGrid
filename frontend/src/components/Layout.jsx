@@ -17,11 +17,13 @@ const Layout = () => {
         key={location.key} forces React to unmount + remount the wrapper div
         on every navigation, which re-triggers the page-enter CSS animation.
       */}
-      <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 overflow-x-hidden">
-        <div key={location.key} className="page-enter">
-          <Outlet />
-        </div>
-      </main>
+      <div className="flex-grow px-4 sm:px-6 lg:px-8">
+        <main className="w-full max-w-[85rem] mx-auto py-8 overflow-x-hidden">
+          <div key={location.key} className="page-enter">
+            <Outlet />
+          </div>
+        </main>
+      </div>
       <Footer />
     </div>
   );

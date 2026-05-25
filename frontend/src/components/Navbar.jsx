@@ -57,7 +57,7 @@ const Navbar = () => {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 mt-4 sticky top-4 z-50 pointer-events-none">
-      <header className="pointer-events-auto mx-auto max-w-7xl bg-white/95 dark:bg-[#1a1a1a]/95 border border-gray-200/50 dark:border-white/10 shadow-lg shadow-emerald-900/5 rounded-2xl transition-all duration-300">
+      <header className="pointer-events-auto mx-auto max-w-[85rem] bg-white/95 dark:bg-[#1a1a1a]/95 border border-gray-200/50 dark:border-white/10 shadow-lg shadow-emerald-900/5 rounded-2xl transition-all duration-300">
         <div className="px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}

@@ -301,8 +301,64 @@ const sendVerificationEmail = async (email, name, verificationUrl) => {
   }
 };
 
+// ─── Contact Admin Email ────────────────────────────────────────────────────────
+
+const sendContactEmail = async (name, email, message) => {
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>New Contact Message</title>
+<style>${baseStyles}</style></head>
+<body>
+<div class="wrapper">
+  <div class="card">
+    <div class="header">
+      <div class="header-logo">📨</div>
+      <h1 class="header-brand">New Contact Message</h1>
+      <p class="header-tagline">From FreshGrid Website</p>
+    </div>
+    <div class="body">
+      <div class="badge">New Inquiry</div>
+      <h2 class="heading">Message from ${name}</h2>
+      
+      <div class="feature-box" style="text-align:left;">
+        <div class="feature-title">Sender Details</div>
+        <div class="feature-item"><span class="feature-icon">👤</span><span class="feature-text"><strong>Name:</strong> ${name}</span></div>
+        <div class="feature-item"><span class="feature-icon">📧</span><span class="feature-text"><strong>Email:</strong> <a href="mailto:${email}">${email}</a></span></div>
+      </div>
+
+      <div class="divider"></div>
+      
+      <h3 style="font-size: 16px; color: #374151; margin-bottom: 12px; font-weight: 700;">Message Content:</h3>
+      <div style="background: #f9fafe; border-left: 4px solid #059669; padding: 16px; font-size: 15px; color: #111827; line-height: 1.6; border-radius: 4px; white-space: pre-wrap;">${message}</div>
+
+    </div>
+    <div class="footer">
+      <p>© ${new Date().getFullYear()} FreshGrid System</p>
+      <p style="margin-top:6px;">You can reply directly to this email to respond to the user.</p>
+    </div>
+  </div>
+</div>
+</body></html>`;
+
+  try {
+    await sgMail.send({
+      from: FROM,
+      to: process.env.GMAIL_USER,
+      replyTo: email,
+      subject: `New Contact Message from ${name}`,
+      html,
+    });
+    console.log('[EMAIL] Contact email sent from:', email);
+    return true;
+  } catch (error) {
+    console.error('Error sending contact email:', error?.response?.body || error.message);
+    return false;
+  }
+};
+
 module.exports = {
   sendWelcomeEmail,
   sendPromotionEmails,
   sendVerificationEmail,
+  sendContactEmail,
 };

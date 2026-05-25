@@ -76,8 +76,9 @@ export default function FloatingNav() {
   const isHome = location.pathname === '/';
 
   return (
-    <div className="mt-4 sticky top-24 z-40 container mx-auto px-4 sm:px-6 lg:px-8 pb-2 pointer-events-none">
-      <div className="flex items-center gap-2 w-max pointer-events-auto">
+    <div className="mt-4 sticky top-24 z-40 px-4 sm:px-6 lg:px-8 pb-2 pointer-events-none">
+      <div className="w-full max-w-[85rem] mx-auto pointer-events-none">
+        <div className="flex items-center gap-2 w-max pointer-events-auto">
         {!isHome && (
           <button 
             onClick={() => navigate('/')} 
@@ -109,6 +110,7 @@ export default function FloatingNav() {
             <ChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" />
           </button>
         )}
+      </div>
       </div>
     </div>
   );
