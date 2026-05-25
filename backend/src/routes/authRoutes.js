@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
+const OAuthCode = require('../models/OAuthCode');
 
 const {
   registerUser,
@@ -24,23 +25,24 @@ const { upload } = require('../config/cloudinary');
 
 const FRONTEND = process.env.FRONTEND_URL || 'http://localhost:5173';
 
-// ─── OAuth Code Deduplication ──────────────────────────────────────────────────
-// Render free plan can run two overlapping instances during redeploy.
-// Both may receive the same Facebook/Google callback and try to exchange
-// the one-time auth code simultaneously. The second always fails with
-// "This authorization code has been used." This map prevents that.
-const usedOAuthCodes = new Map();
-
-const deduplicateOAuth = (req, res, next) => {
+// ─── OAuth Code Deduplication (MongoDB-based, cross-instance) ─────────────────
+// Render free plan runs multiple overlapping server instances during redeploy.
+// Each instance has its own memory — an in-memory Map does NOT work across them.
+// MongoDB's unique index gives us an atomic cross-instance lock:
+// only the FIRST instance to insert a given code proceeds; all others get E11000.
+const deduplicateOAuth = async (req, res, next) => {
   const code = req.query.code;
   if (!code) return next();
-  if (usedOAuthCodes.has(code)) {
-    console.warn('[OAUTH] Duplicate code detected, ignoring second request.');
-    return res.redirect(`${FRONTEND}/login?error=oauth_retry`);
+  try {
+    await OAuthCode.create({ code }); // throws E11000 if another instance already claimed it
+    next();
+  } catch (err) {
+    if (err.code === 11000) {
+      console.warn('[OAUTH] Duplicate code blocked by MongoDB lock — another instance already handled it.');
+      return res.redirect(`${FRONTEND}/login?error=oauth_retry`);
+    }
+    next(err); // unexpected error, let Express handle it
   }
-  usedOAuthCodes.set(code, Date.now());
-  setTimeout(() => usedOAuthCodes.delete(code), 5 * 60 * 1000); // clean up after 5 min
-  next();
 };
 
 const makeJwt = (userId) =>
