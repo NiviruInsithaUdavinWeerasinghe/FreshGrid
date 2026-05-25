@@ -167,9 +167,10 @@ exports.processChatMessage = async (req, res) => {
 
     // 1. Context Management: Search-before-prompt
     // We'll extract keywords from the message and search the Product collection
-    const keywordArray = message.split(' ').filter(word => word.length > 3);
+    const keywordArray = message.split(/[\\s,]+/).filter(word => word.length > 3);
     const keywordsStr = keywordArray.join(' ');
-    const regexPattern = keywordArray.join('|');
+    // Strip trailing 's' for basic plural-to-singular regex matching
+    const regexPattern = keywordArray.map(w => w.replace(/s$/i, '')).join('|');
     
     let relevantProducts = [];
     if (keywordsStr) {
