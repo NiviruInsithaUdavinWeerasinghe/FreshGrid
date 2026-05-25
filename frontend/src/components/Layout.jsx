@@ -21,9 +21,10 @@ const Layout = () => {
           /* Override 100vh constraints on inner auth pages so they fit flex height */
           .page-enter > div {
             min-height: 100% !important;
-            height: 100% !important;
+            height: auto !important;
             background: transparent !important;
-            padding-top: 90px !important; /* Clear floated Navbar space */
+            padding-top: 100px !important; /* Clear floated Navbar space */
+            padding-bottom: 40px !important; /* Spacing so bottom is never cut off */
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
