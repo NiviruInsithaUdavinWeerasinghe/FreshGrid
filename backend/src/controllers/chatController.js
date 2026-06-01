@@ -239,6 +239,22 @@ exports.processChatMessage = async (req, res) => {
       }
     }
 
+    // Fetch products that are in the user's cart so the AI knows their prices
+    const cartProductIds = (cartState || []).map(item => item.id).filter(Boolean);
+    if (cartProductIds.length > 0) {
+      try {
+        const cartProducts = await Product.find({ _id: { $in: cartProductIds } });
+        const existingIds = new Set(relevantProducts.map(p => p._id.toString()));
+        for (const prod of cartProducts) {
+          if (!existingIds.has(prod._id.toString())) {
+            relevantProducts.push(prod);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching cart products:", err);
+      }
+    }
+
     const contextStr = `
 Current Page: ${activePage || '/'}
 Cart State: ${JSON.stringify(cartState || [])}
