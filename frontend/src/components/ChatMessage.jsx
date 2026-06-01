@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
-import { Bot, User, Info, RotateCcw, AlertCircle } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
+import { Bot, User, RotateCcw, AlertCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const ChatMessage = ({ message, user, onRetry }) => {
   const isUser = message.role === 'user';
   const isSystem = message.role === 'system';
-  const [showDetails, setShowDetails] = useState(false);
-
   if (isSystem) {
     if (message.isError) {
       return (
@@ -17,13 +15,6 @@ const ChatMessage = ({ message, user, onRetry }) => {
               <span className="text-xs font-semibold">{message.text}</span>
             </div>
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => setShowDetails(!showDetails)}
-                className="p-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-red-650 dark:text-red-400 transition-colors"
-                title="Error details"
-              >
-                <Info size={14} />
-              </button>
               {onRetry && message.lastUserMessage && (
                 <button
                   onClick={() => onRetry(message.lastUserMessage)}
@@ -36,18 +27,6 @@ const ChatMessage = ({ message, user, onRetry }) => {
               )}
             </div>
           </div>
-          <AnimatePresence>
-            {showDetails && (
-              <motion.div 
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="text-[11px] text-red-500/90 dark:text-red-450/80 border-t border-red-200/30 dark:border-red-900/20 pt-2 mt-0.5 leading-relaxed overflow-hidden"
-              >
-                Technical details: The AI Assistant failed to process the request due to a server connection timeout, model request rate limit, or invalid response format.
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       );
     }
