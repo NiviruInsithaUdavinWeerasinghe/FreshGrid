@@ -2,6 +2,46 @@ import React from 'react';
 import { Bot, User, RotateCcw, AlertCircle, StopCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+const renderMarkdown = (text) => {
+  if (!text) return '';
+  
+  // 1. Escape HTML
+  let html = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+    
+  // 2. Bold: **text**
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  
+  // 3. Italics: *text*
+  html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+  
+  // 4. Parse lines for list items and emojis
+  const lines = html.split('\n');
+  const formattedLines = lines.map(line => {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
+      return `<li class="ml-4 list-disc my-1">${trimmed.substring(2)}</li>`;
+    }
+    
+    // Match any leading emoji followed by spaces
+    const emojiMatch = trimmed.match(/^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)\s+(.*)/u);
+    if (emojiMatch) {
+      return `<div class="flex items-center gap-1.5 my-1.5"><span class="text-base">${emojiMatch[1]}</span><span>${emojiMatch[2]}</span></div>`;
+    }
+    
+    return line;
+  });
+  
+  html = formattedLines.join('\n');
+  
+  // 5. Replace newlines with <br />
+  html = html.replace(/\n/g, '<br />');
+  
+  return <div dangerouslySetInnerHTML={{ __html: html }} className="leading-relaxed" />;
+};
+
 const ChatMessage = ({ message, user, onRetry }) => {
   const isUser = message.role === 'user';
   const isSystem = message.role === 'system';
@@ -69,12 +109,12 @@ const ChatMessage = ({ message, user, onRetry }) => {
         </div>
         
         {/* Bubble */}
-        <div className={`px-5 py-3 rounded-[24px] text-sm whitespace-pre-wrap bg-[#f0f0f3] dark:bg-[#121212] ${
+        <div className={`px-5 py-3 rounded-[24px] text-sm bg-[#f0f0f3] dark:bg-[#121212] ${
           isUser 
             ? 'text-emerald-700 dark:text-emerald-400 rounded-br-none shadow-[inset_4px_4px_8px_#cbcecf,inset_-4px_-4px_8px_#ffffff] dark:shadow-[inset_4px_4px_8px_#070707,inset_-4px_-4px_8px_#1d1d1d]'
             : 'text-gray-800 dark:text-gray-200 rounded-bl-none shadow-[5px_5px_10px_#cbcecf,-5px_-5px_10px_#ffffff] dark:shadow-[5px_5px_10px_#070707,-5px_-5px_10px_#1d1d1d]'
         }`}>
-          {message.text}
+          {renderMarkdown(message.text)}
         </div>
       </div>
     </div>
