@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bot, User, RotateCcw, AlertCircle } from 'lucide-react';
+import { Bot, User, RotateCcw, AlertCircle, StopCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const ChatMessage = ({ message, user, onRetry }) => {
@@ -27,6 +27,17 @@ const ChatMessage = ({ message, user, onRetry }) => {
               )}
             </div>
           </div>
+        </div>
+      );
+    }
+
+    if (message.text === "Generation stopped.") {
+      return (
+        <div className="flex justify-center my-2.5">
+          <span className="text-xs text-amber-600 dark:text-amber-500 font-semibold bg-[#f0f0f3] dark:bg-[#121212] border border-amber-200/40 dark:border-amber-950/40 px-3.5 py-1.5 rounded-full shadow-[3px_3px_6px_#cbcecf,-3px_-3px_6px_#ffffff] dark:shadow-[3px_3px_6px_#070707,-3px_-3px_6px_#1d1d1d] flex items-center gap-1.5">
+            <StopCircle size={12} className="text-amber-500 animate-pulse" />
+            {message.text}
+          </span>
         </div>
       );
     }
