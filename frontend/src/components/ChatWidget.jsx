@@ -26,7 +26,8 @@ const ChatWidget = () => {
     startNewChat,
     stopGeneration,
     editSessionTitle,
-    deleteSession
+    deleteSession,
+    retryMessage
   } = useAiAssistant();
 
   const scrollToBottom = () => {
@@ -267,7 +268,12 @@ const ChatWidget = () => {
                     )}
                     
                     {messages.map((msg) => (
-                      <ChatMessage key={msg.id} message={msg} user={user} />
+                      <ChatMessage 
+                        key={msg.id} 
+                        message={msg} 
+                        user={user} 
+                        onRetry={(lastMsg) => retryMessage(lastMsg, msg.id)}
+                      />
                     ))}
                     
                     {isTyping && (

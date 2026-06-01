@@ -1,12 +1,57 @@
-import React from 'react';
-import { Bot, User } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { Bot, User, Info, RotateCcw, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const ChatMessage = ({ message, user }) => {
+const ChatMessage = ({ message, user, onRetry }) => {
   const isUser = message.role === 'user';
   const isSystem = message.role === 'system';
+  const [showDetails, setShowDetails] = useState(false);
 
   if (isSystem) {
+    if (message.isError) {
+      return (
+        <div className="flex flex-col gap-2.5 my-3 p-3.5 rounded-2xl bg-red-50/70 dark:bg-red-950/20 border border-red-200/50 dark:border-red-900/40 shadow-[3px_3px_6px_#cbcecf,-3px_-3px_6px_#ffffff] dark:shadow-[3px_3px_6px_#070707,-3px_-3px_6px_#1d1d1d]">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+              <AlertCircle size={15} />
+              <span className="text-xs font-semibold">{message.text}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowDetails(!showDetails)}
+                className="p-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-red-650 dark:text-red-400 transition-colors"
+                title="Error details"
+              >
+                <Info size={14} />
+              </button>
+              {onRetry && message.lastUserMessage && (
+                <button
+                  onClick={() => onRetry(message.lastUserMessage)}
+                  className="flex items-center gap-1 px-2.5 py-1 text-xs font-bold bg-[#f0f0f3] dark:bg-[#121212] shadow-[2px_2px_4px_#cbcecf,-2px_-2px_4px_#ffffff] dark:shadow-[2px_2px_4px_#070707,-2px_-2px_4px_#1d1d1d] active:shadow-[inset_1px_1px_2px_#cbcecf,inset_-1px_-1px_2px_#ffffff] text-emerald-650 dark:text-emerald-450 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 rounded-md transition-all"
+                  title="Retry sending message"
+                >
+                  <RotateCcw size={11} />
+                  <span>Retry</span>
+                </button>
+              )}
+            </div>
+          </div>
+          <AnimatePresence>
+            {showDetails && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="text-[11px] text-red-500/90 dark:text-red-450/80 border-t border-red-200/30 dark:border-red-900/20 pt-2 mt-0.5 leading-relaxed overflow-hidden"
+              >
+                Technical details: The AI Assistant failed to process the request due to a server connection timeout, model request rate limit, or invalid response format.
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      );
+    }
+
     return (
       <div className="flex justify-center my-2">
         <span className="text-xs text-gray-500 italic bg-[#f0f0f3] dark:bg-[#121212] px-4 py-1.5 rounded-full shadow-[inset_2px_2px_4px_#cbcecf,inset_-2px_-2px_4px_#ffffff] dark:shadow-[inset_2px_2px_4px_#070707,inset_-2px_-2px_4px_#1d1d1d]">

@@ -245,7 +245,7 @@ export const useAiAssistant = () => {
         console.log('Request canceled by user');
       } else {
         console.error('Chat error:', error);
-        setMessages(prev => [...prev, { id: Date.now(), role: 'system', text: "Sorry, I couldn't process that request right now." }]);
+        setMessages(prev => [...prev, { id: Date.now(), role: 'system', text: "Sorry, I couldn't process that request right now.", isError: true, lastUserMessage: text }]);
       }
     } finally {
       setIsTyping(false);
@@ -332,6 +332,11 @@ export const useAiAssistant = () => {
     }
   }, [token, startNewChat]);
 
+  const retryMessage = useCallback(async (lastUserMessage, errorMsgId) => {
+    setMessages(prev => prev.filter(msg => msg.id !== errorMsgId));
+    await sendMessage(lastUserMessage);
+  }, [sendMessage]);
+
   return { 
     messages, 
     isTyping, 
@@ -342,6 +347,7 @@ export const useAiAssistant = () => {
     startNewChat,
     stopGeneration,
     editSessionTitle,
-    deleteSession
+    deleteSession,
+    retryMessage
   };
 };
