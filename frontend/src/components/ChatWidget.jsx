@@ -180,25 +180,29 @@ const ChatWidget = () => {
                                 <div className="flex items-center justify-between w-full">
                                   <span className="text-xs font-semibold text-red-650 dark:text-red-400 animate-pulse">Delete this chat?</span>
                                   <div className="flex items-center gap-1.5">
-                                    <button
+                                    <motion.button
+                                      whileHover={{ scale: 1.08 }}
+                                      whileTap={{ scale: 0.92 }}
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         deleteSession(session.sessionId);
                                         setDeletingSessionId(null);
                                       }}
-                                      className="px-2.5 py-1 text-xs font-bold bg-[#f0f0f3] dark:bg-[#121212] shadow-[2px_2px_4px_#cbcecf,-2px_-2px_4px_#ffffff] dark:shadow-[2px_2px_4px_#070707,-2px_-2px_4px_#1d1d1d] active:shadow-[inset_1px_1px_2px_#cbcecf,inset_-1px_-1px_2px_#ffffff] text-red-600 hover:text-red-700 dark:text-red-400 rounded-lg transition-all"
+                                      className="px-3 py-1 text-xs font-bold bg-[#f0f0f3] dark:bg-[#121212] shadow-[2px_2px_4px_#cbcecf,-2px_-2px_4px_#ffffff] dark:shadow-[2px_2px_4px_#070707,-2px_-2px_4px_#1d1d1d] active:shadow-[inset_1px_1px_2px_#cbcecf,inset_-1px_-1px_2px_#ffffff] text-red-650 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition-all cursor-pointer"
                                     >
                                       Yes
-                                    </button>
-                                    <button
+                                    </motion.button>
+                                    <motion.button
+                                      whileHover={{ scale: 1.08 }}
+                                      whileTap={{ scale: 0.92 }}
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         setDeletingSessionId(null);
                                       }}
-                                      className="px-2.5 py-1 text-xs font-bold bg-[#f0f0f3] dark:bg-[#121212] shadow-[2px_2px_4px_#cbcecf,-2px_-2px_4px_#ffffff] dark:shadow-[2px_2px_4px_#070707,-2px_-2px_4px_#1d1d1d] active:shadow-[inset_1px_1px_2px_#cbcecf,inset_-1px_-1px_2px_#ffffff] text-gray-550 dark:text-gray-400 rounded-lg transition-all"
+                                      className="px-3 py-1 text-xs font-bold bg-[#f0f0f3] dark:bg-[#121212] shadow-[2px_2px_4px_#cbcecf,-2px_-2px_4px_#ffffff] dark:shadow-[2px_2px_4px_#070707,-2px_-2px_4px_#1d1d1d] active:shadow-[inset_1px_1px_2px_#cbcecf,inset_-1px_-1px_2px_#ffffff] text-gray-550 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all cursor-pointer"
                                     >
                                       No
-                                    </button>
+                                    </motion.button>
                                   </div>
                                 </div>
                               ) : (
