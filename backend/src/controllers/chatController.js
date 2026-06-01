@@ -261,7 +261,7 @@ User Message: ${message}`;
 
     if (shouldGenerateTitle) {
       try {
-        const titleModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const titleModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
         const summaryPrompt = `Based on the following user message, generate a very brief, concise title (max 4-5 words) representing the topic. Return only the title text, nothing else. Do not use quotes, punctuation, or explanations.\n\nUser Message: "${message}"`;
         const titleResult = await titleModel.generateContent(summaryPrompt);
         let summaryTitle = titleResult.response.text().trim();
@@ -304,7 +304,7 @@ User Message: ${message}`;
     geminiHistory.pop(); 
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
+      model: "gemini-1.5-flash-latest",
       systemInstruction,
       tools: [{ functionDeclarations: chatTools }]
     });
