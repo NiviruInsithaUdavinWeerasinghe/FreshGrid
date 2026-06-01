@@ -33,11 +33,16 @@ const ChatMessage = ({ message, user, onRetry }) => {
 
     if (message.text === "Generation stopped.") {
       return (
-        <div className="flex justify-start my-2 ml-10">
-          <span className="text-xs text-gray-600 dark:text-gray-400 font-semibold bg-[#f0f0f3] dark:bg-[#121212] border border-gray-300/40 dark:border-gray-800/40 px-3 py-1 rounded-full shadow-[inset_2px_2px_4px_#cbcecf,inset_-2px_-2px_4px_#ffffff] dark:shadow-[inset_2px_2px_4px_#070707,inset_-2px_-2px_4px_#1d1d1d] flex items-center gap-1.5">
-            <StopCircle size={11} className="text-gray-500" />
-            {message.text}
-          </span>
+        <div className="flex w-full my-3 justify-start">
+          <div className="flex max-w-[85%] flex-row items-end gap-2">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center overflow-hidden bg-[#f0f0f3] dark:bg-[#121212] text-emerald-500 shadow-[3px_3px_6px_#cbcecf,-3px_-3px_6px_#ffffff] dark:shadow-[3px_3px_6px_#070707,-3px_-3px_6px_#1d1d1d]">
+              <Bot size={16} />
+            </div>
+            <span className="text-xs text-gray-600 dark:text-gray-400 font-semibold bg-[#f0f0f3] dark:bg-[#121212] border border-gray-300/40 dark:border-gray-800/40 px-4 py-2 rounded-full shadow-[inset_2px_2px_4px_#cbcecf,inset_-2px_-2px_4px_#ffffff] dark:shadow-[inset_2px_2px_4px_#070707,inset_-2px_-2px_4px_#1d1d1d] flex items-center gap-1.5 rounded-bl-none">
+              <StopCircle size={11} className="text-gray-500" />
+              {message.text}
+            </span>
+          </div>
         </div>
       );
     }
