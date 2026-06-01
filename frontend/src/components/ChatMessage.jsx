@@ -33,9 +33,9 @@ const ChatMessage = ({ message, user, onRetry }) => {
 
     if (message.text === "Generation stopped.") {
       return (
-        <div className="flex justify-center my-2.5">
-          <span className="text-xs text-amber-600 dark:text-amber-500 font-semibold bg-[#f0f0f3] dark:bg-[#121212] border border-amber-200/40 dark:border-amber-950/40 px-3.5 py-1.5 rounded-full shadow-[3px_3px_6px_#cbcecf,-3px_-3px_6px_#ffffff] dark:shadow-[3px_3px_6px_#070707,-3px_-3px_6px_#1d1d1d] flex items-center gap-1.5">
-            <StopCircle size={12} className="text-amber-500 animate-pulse" />
+        <div className="flex justify-start my-2 ml-10">
+          <span className="text-xs text-gray-600 dark:text-gray-400 font-semibold bg-[#f0f0f3] dark:bg-[#121212] border border-gray-300/40 dark:border-gray-800/40 px-3 py-1 rounded-full shadow-[inset_2px_2px_4px_#cbcecf,inset_-2px_-2px_4px_#ffffff] dark:shadow-[inset_2px_2px_4px_#070707,inset_-2px_-2px_4px_#1d1d1d] flex items-center gap-1.5">
+            <StopCircle size={11} className="text-gray-500" />
             {message.text}
           </span>
         </div>
