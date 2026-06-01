@@ -243,7 +243,7 @@ Relevant Products from DB: ${JSON.stringify(relevantProducts.map(p => ({id: p._i
 User Message: ${message}`;
 
     // 2. Fetch or create ChatHistory
-    let isNewChat = false;
+    let shouldGenerateTitle = false;
     let chatSession = await ChatHistory.findOne({ sessionId });
     if (!chatSession) {
       chatSession = new ChatHistory({
@@ -251,12 +251,12 @@ User Message: ${message}`;
         sessionId,
         history: []
       });
-      isNewChat = true;
-    } else if (chatSession.history.length === 0) {
-      isNewChat = true;
+      shouldGenerateTitle = true;
+    } else if (!chatSession.title || chatSession.title.endsWith('...')) {
+      shouldGenerateTitle = true;
     }
 
-    if (isNewChat) {
+    if (shouldGenerateTitle) {
       try {
         const titleModel = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
         const summaryPrompt = `Based on the following user message, generate a very brief, concise title (max 4-5 words) representing the topic. Return only the title text, nothing else. Do not use quotes, punctuation, or explanations.\n\nUser Message: "${message}"`;
@@ -264,10 +264,16 @@ User Message: ${message}`;
         let summaryTitle = titleResult.response.text().trim();
         // Remove quotes if any
         summaryTitle = summaryTitle.replace(/^["']|["']$/g, '');
-        chatSession.title = summaryTitle || (message.length > 30 ? message.substring(0, 30) + '...' : message);
+        if (summaryTitle) {
+          chatSession.title = summaryTitle;
+        } else if (!chatSession.title) {
+          chatSession.title = message.length > 30 ? message.substring(0, 30) + '...' : message;
+        }
       } catch (err) {
         console.error("Error generating title with Gemini:", err);
-        chatSession.title = message.length > 30 ? message.substring(0, 30) + '...' : message;
+        if (!chatSession.title) {
+          chatSession.title = message.length > 30 ? message.substring(0, 30) + '...' : message;
+        }
       }
     }
 
