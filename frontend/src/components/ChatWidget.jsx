@@ -12,6 +12,7 @@ const ChatWidget = () => {
   const [inputText, setInputText] = useState('');
   const [editingSessionId, setEditingSessionId] = useState(null);
   const [editingTitleText, setEditingTitleText] = useState('');
+  const [deletingSessionId, setDeletingSessionId] = useState(null);
   const messagesEndRef = useRef(null);
   const { user } = useAuth();
   
@@ -175,6 +176,31 @@ const ChatWidget = () => {
                                     <X size={14} />
                                   </button>
                                 </div>
+                              ) : deletingSessionId === session.sessionId ? (
+                                <div className="flex items-center justify-between w-full">
+                                  <span className="text-xs font-semibold text-red-650 dark:text-red-400 animate-pulse">Delete this chat?</span>
+                                  <div className="flex items-center gap-1.5">
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        deleteSession(session.sessionId);
+                                        setDeletingSessionId(null);
+                                      }}
+                                      className="px-2.5 py-1 text-xs font-bold bg-[#f0f0f3] dark:bg-[#121212] shadow-[2px_2px_4px_#cbcecf,-2px_-2px_4px_#ffffff] dark:shadow-[2px_2px_4px_#070707,-2px_-2px_4px_#1d1d1d] active:shadow-[inset_1px_1px_2px_#cbcecf,inset_-1px_-1px_2px_#ffffff] text-red-600 hover:text-red-700 dark:text-red-400 rounded-lg transition-all"
+                                    >
+                                      Yes
+                                    </button>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setDeletingSessionId(null);
+                                      }}
+                                      className="px-2.5 py-1 text-xs font-bold bg-[#f0f0f3] dark:bg-[#121212] shadow-[2px_2px_4px_#cbcecf,-2px_-2px_4px_#ffffff] dark:shadow-[2px_2px_4px_#070707,-2px_-2px_4px_#1d1d1d] active:shadow-[inset_1px_1px_2px_#cbcecf,inset_-1px_-1px_2px_#ffffff] text-gray-550 dark:text-gray-400 rounded-lg transition-all"
+                                    >
+                                      No
+                                    </button>
+                                  </div>
+                                </div>
                               ) : (
                                 <div 
                                   onClick={() => handleLoadSession(session.sessionId)}
@@ -191,7 +217,7 @@ const ChatWidget = () => {
                               )}
                             </div>
 
-                            {!isEditing && (
+                            {!isEditing && deletingSessionId !== session.sessionId && (
                               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button
                                   onClick={(e) => {
@@ -207,9 +233,7 @@ const ChatWidget = () => {
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    if (confirm('Are you sure you want to delete this chat session?')) {
-                                      deleteSession(session.sessionId);
-                                    }
+                                    setDeletingSessionId(session.sessionId);
                                   }}
                                   className="p-1.5 rounded-full hover:bg-red-50 dark:hover:bg-red-950/20 text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-all"
                                   title="Delete Chat"
