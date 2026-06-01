@@ -6,6 +6,10 @@ const chatHistorySchema = new mongoose.Schema({
     ref: 'User',
     required: false // Allow anonymous sessions for now, though we can link to User later
   },
+  title: {
+    type: String,
+    required: false
+  },
   sessionId: {
     type: String,
     required: true

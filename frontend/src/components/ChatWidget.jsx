@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, X, Send, History, Plus, Clock } from 'lucide-react';
+import { MessageSquare, X, Send, History, Plus, Clock, Edit2, Trash2, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAiAssistant } from '../hooks/useAiAssistant';
 import { useAuth } from '../context/AuthContext';
@@ -10,6 +10,8 @@ const ChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [inputText, setInputText] = useState('');
+  const [editingSessionId, setEditingSessionId] = useState(null);
+  const [editingTitleText, setEditingTitleText] = useState('');
   const messagesEndRef = useRef(null);
   const { user } = useAuth();
   
@@ -21,7 +23,9 @@ const ChatWidget = () => {
     fetchSessions, 
     loadSession, 
     startNewChat,
-    stopGeneration
+    stopGeneration,
+    editSessionTitle,
+    deleteSession
   } = useAiAssistant();
 
   const scrollToBottom = () => {
@@ -60,6 +64,12 @@ const ChatWidget = () => {
   const handleLoadSession = (sessionId) => {
     loadSession(sessionId);
     setShowHistory(false);
+  };
+
+  const handleSaveTitle = (sessionId) => {
+    if (!editingTitleText.trim()) return;
+    editSessionTitle(sessionId, editingTitleText.trim());
+    setEditingSessionId(null);
   };
 
   const location = useLocation();
@@ -126,21 +136,91 @@ const ChatWidget = () => {
                         No previous chats found.
                       </div>
                     ) : (
-                      chatSessions.map((session) => (
-                        <button
-                          key={session.sessionId}
-                          onClick={() => handleLoadSession(session.sessionId)}
-                          className="w-full text-left p-3 rounded-xl bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 hover:border-emerald-500/50 transition-colors group"
-                        >
-                          <div className="text-sm text-gray-800 dark:text-gray-200 truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                            "{session.title}"
+                      chatSessions.map((session) => {
+                        const isEditing = editingSessionId === session.sessionId;
+                        return (
+                          <div
+                            key={session.sessionId}
+                            className="w-full flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 hover:border-emerald-500/50 transition-colors group"
+                          >
+                            <div className="flex-1 min-w-0 mr-2">
+                              {isEditing ? (
+                                <div className="flex items-center gap-1.5 w-full">
+                                  <input
+                                    type="text"
+                                    value={editingTitleText}
+                                    onChange={(e) => setEditingTitleText(e.target.value)}
+                                    className="flex-1 bg-white dark:bg-[#121212] border border-emerald-400 dark:border-emerald-500 rounded px-2 py-0.5 text-sm text-gray-800 dark:text-gray-200 focus:outline-none"
+                                    autoFocus
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') {
+                                        handleSaveTitle(session.sessionId);
+                                      } else if (e.key === 'Escape') {
+                                        setEditingSessionId(null);
+                                      }
+                                    }}
+                                  />
+                                  <button
+                                    onClick={() => handleSaveTitle(session.sessionId)}
+                                    className="p-1 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded"
+                                    title="Save"
+                                  >
+                                    <Check size={14} />
+                                  </button>
+                                  <button
+                                    onClick={() => setEditingSessionId(null)}
+                                    className="p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-850 rounded"
+                                    title="Cancel"
+                                  >
+                                    <X size={14} />
+                                  </button>
+                                </div>
+                              ) : (
+                                <div 
+                                  onClick={() => handleLoadSession(session.sessionId)}
+                                  className="cursor-pointer"
+                                >
+                                  <div className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                                    "{session.title}"
+                                  </div>
+                                  <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                                    <Clock size={10} />
+                                    {new Date(session.updatedAt).toLocaleDateString()}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            {!isEditing && (
+                              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setEditingSessionId(session.sessionId);
+                                    setEditingTitleText(session.title || '');
+                                  }}
+                                  className="p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all"
+                                  title="Edit Title"
+                                >
+                                  <Edit2 size={13} />
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (confirm('Are you sure you want to delete this chat session?')) {
+                                      deleteSession(session.sessionId);
+                                    }
+                                  }}
+                                  className="p-1.5 rounded-full hover:bg-red-50 dark:hover:bg-red-950/20 text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-all"
+                                  title="Delete Chat"
+                                >
+                                  <Trash2 size={13} />
+                                </button>
+                              </div>
+                            )}
                           </div>
-                          <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                            <Clock size={10} />
-                            {new Date(session.updatedAt).toLocaleDateString()}
-                          </div>
-                        </button>
-                      ))
+                        );
+                      })
                     )}
                   </motion.div>
                 ) : (

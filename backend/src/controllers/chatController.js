@@ -243,6 +243,7 @@ Relevant Products from DB: ${JSON.stringify(relevantProducts.map(p => ({id: p._i
 User Message: ${message}`;
 
     // 2. Fetch or create ChatHistory
+    let isNewChat = false;
     let chatSession = await ChatHistory.findOne({ sessionId });
     if (!chatSession) {
       chatSession = new ChatHistory({
@@ -250,6 +251,24 @@ User Message: ${message}`;
         sessionId,
         history: []
       });
+      isNewChat = true;
+    } else if (chatSession.history.length === 0) {
+      isNewChat = true;
+    }
+
+    if (isNewChat) {
+      try {
+        const titleModel = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+        const summaryPrompt = `Based on the following user message, generate a very brief, concise title (max 4-5 words) representing the topic. Return only the title text, nothing else. Do not use quotes, punctuation, or explanations.\n\nUser Message: "${message}"`;
+        const titleResult = await titleModel.generateContent(summaryPrompt);
+        let summaryTitle = titleResult.response.text().trim();
+        // Remove quotes if any
+        summaryTitle = summaryTitle.replace(/^["']|["']$/g, '');
+        chatSession.title = summaryTitle || (message.length > 30 ? message.substring(0, 30) + '...' : message);
+      } catch (err) {
+        console.error("Error generating title with Gemini:", err);
+        chatSession.title = message.length > 30 ? message.substring(0, 30) + '...' : message;
+      }
     }
 
     // Add user message to history
@@ -462,14 +481,17 @@ exports.getHistory = async (req, res) => {
     const sessions = await ChatHistory.find(query).sort({ updatedAt: -1 }).limit(20);
     
     const formattedSessions = sessions.map(session => {
-      // Find first user message for title
-      const firstUserMsg = session.history.find(msg => msg.role === 'user');
-      let title = "New Conversation";
-      if (firstUserMsg && firstUserMsg.parts[0] && firstUserMsg.parts[0].text) {
-        // Extract the actual user message from the context string
-        const match = firstUserMsg.parts[0].text.match(/User Message: (.*)/);
-        title = match ? match[1] : "Chat Session";
-        if (title.length > 40) title = title.substring(0, 40) + '...';
+      let title = session.title;
+      if (!title) {
+        // Find first user message for title
+        const firstUserMsg = session.history.find(msg => msg.role === 'user');
+        title = "New Conversation";
+        if (firstUserMsg && firstUserMsg.parts[0] && firstUserMsg.parts[0].text) {
+          // Extract the actual user message from the context string
+          const match = firstUserMsg.parts[0].text.match(/User Message: (.*)/);
+          title = match ? match[1] : "Chat Session";
+          if (title.length > 40) title = title.substring(0, 40) + '...';
+        }
       }
       return {
         sessionId: session.sessionId,
@@ -525,5 +547,37 @@ exports.getSession = async (req, res) => {
   } catch (error) {
     console.error('getSession error:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch session' });
+  }
+};
+
+exports.editTitle = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { title } = req.body;
+    if (!title) {
+      return res.status(400).json({ success: false, message: 'Title is required' });
+    }
+    const session = await ChatHistory.findOneAndUpdate({ sessionId }, { title }, { new: true });
+    if (!session) {
+      return res.status(404).json({ success: false, message: 'Session not found' });
+    }
+    res.json({ success: true, message: 'Title updated successfully', data: session });
+  } catch (error) {
+    console.error('editTitle error:', error);
+    res.status(500).json({ success: false, message: 'Failed to update title' });
+  }
+};
+
+exports.deleteSession = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const session = await ChatHistory.findOneAndDelete({ sessionId });
+    if (!session) {
+      return res.status(404).json({ success: false, message: 'Session not found' });
+    }
+    res.json({ success: true, message: 'Session deleted successfully' });
+  } catch (error) {
+    console.error('deleteSession error:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete session' });
   }
 };

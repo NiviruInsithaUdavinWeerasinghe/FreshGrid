@@ -7,5 +7,7 @@ const { optionalAuth } = require('../middleware/auth');
 router.post('/', optionalAuth, chatController.processChatMessage);
 router.get('/history', optionalAuth, chatController.getHistory);
 router.get('/:sessionId', optionalAuth, chatController.getSession);
+router.put('/:sessionId/title', optionalAuth, chatController.editTitle);
+router.delete('/:sessionId', optionalAuth, chatController.deleteSession);
 
 module.exports = router;

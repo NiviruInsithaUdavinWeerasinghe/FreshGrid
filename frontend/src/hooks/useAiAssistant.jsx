@@ -301,6 +301,37 @@ export const useAiAssistant = () => {
     setMessages([]);
   }, []);
 
+  const editSessionTitle = useCallback(async (sessionId, newTitle) => {
+    try {
+      const res = await axios.put(`${API}/${sessionId}/title`, { title: newTitle }, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        withCredentials: true
+      });
+      if (res.data.success) {
+        setChatSessions(prev => prev.map(s => s.sessionId === sessionId ? { ...s, title: newTitle } : s));
+      }
+    } catch (err) {
+      console.error('Failed to edit session title:', err);
+    }
+  }, [token]);
+
+  const deleteSession = useCallback(async (sessionId) => {
+    try {
+      const res = await axios.delete(`${API}/${sessionId}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        withCredentials: true
+      });
+      if (res.data.success) {
+        setChatSessions(prev => prev.filter(s => s.sessionId !== sessionId));
+        if (sessionIdRef.current === sessionId) {
+          startNewChat();
+        }
+      }
+    } catch (err) {
+      console.error('Failed to delete session:', err);
+    }
+  }, [token, startNewChat]);
+
   return { 
     messages, 
     isTyping, 
@@ -309,6 +340,8 @@ export const useAiAssistant = () => {
     fetchSessions, 
     loadSession, 
     startNewChat,
-    stopGeneration
+    stopGeneration,
+    editSessionTitle,
+    deleteSession
   };
 };
